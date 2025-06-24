@@ -97,28 +97,6 @@ This project is licensed under the [MIT License](LICENSE).
 
 ---
 
-## 🌍 Open Source Best Practices
-To declare a project as open source:
-- Use a permissive license (MIT, Apache 2.0, etc.) and include a `LICENSE` file.
-- Add a `CONTRIBUTING.md` to guide contributors.
-- Provide a clear, professional `README.md` with:
-  - Project purpose and features
-  - Setup and usage instructions
-  - Contribution guidelines
-  - License information
-- Use badges (build, license, etc.) for credibility.
-- Respond to issues and PRs to foster community.
-
-**Hacks to Make Your Project Famous:**
-- Write a launch blog post and share on [dev.to](https://dev.to/), [Medium](https://medium.com/), and [Hashnode](https://hashnode.com/).
-- Tweet about it and tag relevant communities (e.g., #ReactNative, #AndroidDev, #OpenSource).
-- Submit to [Awesome React Native](https://github.com/jondot/awesome-react-native) and similar lists.
-- Engage with contributors, review PRs, and keep the project active.
-- Add real-world usage examples and GIFs/screenshots to the README.
-- Consider making a short demo video for YouTube.
-
----
-
 ## 📚 Learn More
 - [React Native Docs](https://reactnative.dev/docs/getting-started)
 - [Android Native Modules](https://reactnative.dev/docs/native-modules-android)
