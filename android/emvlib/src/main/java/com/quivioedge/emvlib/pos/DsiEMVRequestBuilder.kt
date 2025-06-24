@@ -1,18 +1,18 @@
 package com.quivioedge.emvlib.pos
 
-import java.util.UUID
+import com.quivioedge.emvlib.pos.models.PAXConfig
 
-class DsiEMVRequestBuilder() {
+class DsiEMVRequestBuilder(val paxConfig: PAXConfig) {
 
-    private val merchantID = "SONNYTAMA35000GP"
-    private val pinPadIpAddress = "127.0.0.1"
-    private val pinPadIpPort = "1235"
-    private val operationMode = "CERT"
+    private val merchantID = paxConfig.merchantID
+    private val pinPadIpAddress = paxConfig.pinPadIPAddress
+    private val pinPadIpPort = paxConfig.pinPadIPPort
+    private val operationMode = if(paxConfig.isSandBox) "CERT" else "PROD"
+    private val secureDevice = paxConfig.secureDeviceName
     private var sequenceNo = 10
-    private val secureDevice = "EMV_A920PRO_DATACAP_E2E"
     private val posPackageID = "dsiEMVAndroid:1.0"
+    private fun getUserTrace() = paxConfig.operatorID
 
-    private fun getUserTrace() = UUID.randomUUID()
 
     fun nextSequenceNo(): String {
         sequenceNo++

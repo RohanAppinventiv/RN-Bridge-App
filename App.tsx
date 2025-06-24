@@ -1,12 +1,28 @@
-import React from 'react';
-import { View, Button, NativeModules } from 'react-native';
+import React, { useEffect } from 'react';
+import { View, Button, NativeModules, Platform } from 'react-native';
 
 const { EMVPayment } = NativeModules;
 
 export default function App() {
+  useEffect(() => {
+    if (Platform.OS === 'android') {
+      const config = {
+        merchantID: 'SONNYTAMA35000GP',
+        pinPadIPAddress: '127.0.0.1',
+        pinPadIPPort: '1235',
+        isSandBox: true,
+        secureDeviceName: 'EMV_A920PRO_DATACAP_E2E',
+        operatorID: 'operator_001',
+      };
+
+      // This JS object is automatically marshalled into a ReadableMap
+      EMVPayment.initPAXConfig(config);
+    }
+  }, []);
+
   const startTransaction = async () => {
     try {
-      const result = await EMVPayment.startTransaction(100.0);
+      const result = await EMVPayment.startEMVTransaction(100.0);
       console.log('Transaction result:', result);
     } catch (e) {
       console.error('Transaction error:', e);

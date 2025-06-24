@@ -3,16 +3,20 @@ package com.quivioedge.emvlib.pos
 import android.content.Context
 import android.util.Log
 import com.datacap.android.ProcessTransactionResponseListener
+import com.quivioedge.emvlib.pos.models.PAXConfig
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-class POSTransactionExecutor(context: Context) {
+class POSTransactionExecutor(
+    context: Context,
+    paxConfig: PAXConfig
+    ) {
 
     private val dsiEMVAndroidLib  by lazy {
         DsiEMVInstanceBuilder.getInstance(context)
     }
     private val requestBuilder by lazy {
-        DsiEMVRequestBuilder()
+        DsiEMVRequestBuilder(paxConfig)
     }
 
     suspend fun downloadParam(){
@@ -45,7 +49,6 @@ class POSTransactionExecutor(context: Context) {
             Log.d("POSTransactionExecutor", "Inside doSale()")
             val request = requestBuilder.buildEMVSaleRequest()
             Log.d("POSTransactionExecutor", "Request prepared: $request")
-
             dsiEMVAndroidLib.ProcessTransaction(request)
         }
     }

@@ -2,18 +2,27 @@ package com.quivioedge.emvlib.pos
 
 import android.content.Context
 import android.util.Log
+import com.quivioedge.emvlib.pos.models.PAXConfig
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlin.math.log
 
-class EMVBridge (val context: Context): PosCardListener, PosTransactionListener, MessageEvent {
+class EMVBridge private constructor (
+    context: Context, paxConfig: PAXConfig
+): PosCardListener, PosTransactionListener, MessageEvent {
 
+
+    companion object {
+        fun initialise(context: Context, paxConfig: PAXConfig): EMVBridge{
+            return EMVBridge(context, paxConfig)
+        }
+    }
     private val posManager by lazy {
-        DsiEMVManager(context)
+        DsiEMVManager(context, paxConfig)
     }
 
-     fun startEMVTransaction(){
+     fun startEMVSaleTransaction(){
          CoroutineScope(Dispatchers.Main).launch {
              posManager.runTransaction()
              listenTransactionResults()

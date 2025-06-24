@@ -3,20 +3,23 @@ package com.quivioedge.emvlib.pos
 import android.content.Context
 import android.util.Log
 import com.datacap.android.ProcessTransactionResponseListener
+import com.quivioedge.emvlib.pos.models.PAXConfig
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 
-internal class DsiEMVManager(val context: Context) {
+internal class DsiEMVManager(
+    val context: Context, paxConfig: PAXConfig
+) {
     private var currentPosState: PosState = PosState.Idle
     private var posTransactionListener: PosTransactionListener? = null
     private var posCardListener: PosCardListener? = null
     private var messageBus: MessageEvent? = null
 
     private val posTransactionExecutor by lazy {
-        POSTransactionExecutor(context)
+        POSTransactionExecutor(context, paxConfig)
     }
 
     private val posResponseExtractor by lazy {
@@ -36,12 +39,11 @@ internal class DsiEMVManager(val context: Context) {
                         }
 
                         else -> {
-                            currentPosState = PosState.ResetPad
-                            runTransaction()
-                            posTransactionListener?.onTransactionSFailed(result.msg)
-                            result.printData?.let{
-                                posTransactionListener?.askToPrintReceipt(it)
+                            if(currentPosState != PosState.ResetPad) {
+                                currentPosState = PosState.ResetPad
+                                runTransaction()
                             }
+                            posTransactionListener?.onTransactionSFailed(result.msg)
                         }
                     }
                 }
