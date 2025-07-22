@@ -9,20 +9,22 @@ import kotlinx.coroutines.launch
 import kotlin.math.log
 
 class EMVBridge private constructor (
-    context: Context, paxConfig: PAXConfig
+    context: Context,
+    paxConfig: PAXConfig,
+    private val callback: EMVBridgeCallback
 ): PosCardListener, PosTransactionListener, MessageEvent {
 
 
     companion object {
-        fun initialise(context: Context, paxConfig: PAXConfig): EMVBridge{
-            return EMVBridge(context, paxConfig)
+        fun initialise(context: Context, paxConfig: PAXConfig, rnEventCallback: EMVBridgeCallback): EMVBridge{
+            return EMVBridge(context, paxConfig, rnEventCallback)
         }
     }
     private val posManager by lazy {
         DsiEMVManager(context, paxConfig)
     }
 
-     fun startEMVSaleTransaction(){
+     fun startEMVSaleTransaction(amount: Double){
          CoroutineScope(Dispatchers.Main).launch {
              posManager.runTransaction()
              listenTransactionResults()
@@ -31,6 +33,7 @@ class EMVBridge private constructor (
 
          }
     }
+
 
     suspend fun collectEMVCardData(){
         posManager.collectCardDetails()
@@ -77,7 +80,7 @@ class EMVBridge private constructor (
     }
 
     override fun onAlertReceived(message: String) {
-
+        callback.onAlertReceived(message)
     }
 
     override fun onWarningReceived(message: String) {

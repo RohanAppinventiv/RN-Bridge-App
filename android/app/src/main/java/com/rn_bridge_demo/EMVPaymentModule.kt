@@ -1,17 +1,20 @@
 package com.rn_bridge_demo
 
+import android.util.Log
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactContextBaseJavaModule
 import com.facebook.react.bridge.ReactMethod
-import com.facebook.react.bridge.Promise
+import com.facebook.react.modules.core.DeviceEventManagerModule
 import com.facebook.react.bridge.ReadableMap
+import com.quivioedge.emvlib.pos.CardBin
 import com.quivioedge.emvlib.pos.EMVBridge
+import com.quivioedge.emvlib.pos.EMVBridgeCallback
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class EMVPaymentModule(reactContext: ReactApplicationContext) :
-    ReactContextBaseJavaModule(reactContext) {
+    ReactContextBaseJavaModule(reactContext),EMVBridgeCallback {
 
     companion object {
         const val NAME = "EMVPayment"
@@ -28,45 +31,63 @@ class EMVPaymentModule(reactContext: ReactApplicationContext) :
             throw UninitializedPropertyAccessException("EMVPaymentModule: React activity hasn't been initialised ")
             return
         }
-        emvBridge = EMVBridge.initialise(activity, posConfig)
+        emvBridge = EMVBridge.initialise(activity, posConfig, this)
     }
 
     @ReactMethod
-    fun startEMVTransaction(amount: Double, promise: Promise) {
-        try {
-            emvBridge.startEMVSaleTransaction()
-            promise.resolve("Transaction started")
-        } catch (e: Exception) {
-            promise.reject("TRANSACTION_ERROR", e)
-        }
-    }
-
-    @ReactMethod
-    fun getCardDetails(promise: Promise) {
+    fun startEMVTransaction(amount: Double) {
         CoroutineScope(Dispatchers.Main).launch {
-            try {
-                emvBridge.collectEMVCardData()
-                promise.resolve("Card details collected")
-            } catch (e: Exception) {
-                promise.reject("CARD_ERROR", e)
-            }
+            emvBridge.startEMVSaleTransaction(amount)
         }
     }
 
     @ReactMethod
-    fun cancelTransaction(promise: Promise) {
-        promise.resolve(true)
-    }
-
-    @ReactMethod
-    fun printReceipt(str: String, promise: Promise) {
+    fun getCardDetails() {
         CoroutineScope(Dispatchers.Main).launch {
-            try {
-                emvBridge.printReceipt(str)
-                promise.resolve("Printing Done!")
-            } catch (e: Exception) {
-                promise.reject("PRINTING_ERROR", e)
-            }
+            emvBridge.collectEMVCardData()
         }
+    }
+
+    @ReactMethod
+    fun cancelTransaction() {
+        CoroutineScope(Dispatchers.Main).launch {
+            emvBridge.clearAllListeners()
+        }
+    }
+
+    @ReactMethod
+    fun printReceipt(str: String) {
+        CoroutineScope(Dispatchers.Main).launch {
+            emvBridge.printReceipt(str)
+        }
+    }
+
+    override fun onDataReceived(cardBin: CardBin) {
+        Log.d("TAG", "onDataReceived: $cardBin")
+    }
+
+    override fun onCardFailed(message: String) {
+    }
+
+    override fun onTransactionSuccessFull(message: String) {
+    }
+
+    override fun onTransactionSFailed(message: String) {
+    }
+
+    override fun askToPrintReceipt(printBody: String) {
+    }
+
+    override fun onAlertReceived(message: String) {
+        Log.d("TAG", "EMVPaymentModule onAlertReceived: $message")
+    }
+
+    override fun onWarningReceived(message: String) {
+    }
+
+    private fun sendEvent(eventName: String, params: Any?) {
+        reactApplicationContext
+            .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter::class.java)
+            .emit(eventName, params)
     }
 }
