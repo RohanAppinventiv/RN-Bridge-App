@@ -56,11 +56,16 @@ const EMVPaymentScreen: React.FC = () => {
     EVENT_NAMES.forEach((event) => {
       listenersRef.current[event] = emitter.addListener(event, (payload: any) => {
         appendLog(event, payload);
+        if (event === 'onConfigPingSuccess') {
+          appendLog('pingConfigResponse', 'Ping config succeeded');
+        } else if (event === 'onConfigPingFailed') {
+          appendLog('pingConfigResponse', 'Ping config failed');
+        }
       });
     });
 
     // Initialize the native module on mount
-    DsiEMVManagerBridge.initialize();
+    // DsiEMVManagerBridge.initialize();
 
     return () => {
       Object.values(listenersRef.current).forEach((listener) => {
@@ -76,8 +81,12 @@ const EMVPaymentScreen: React.FC = () => {
   }, [appendLog]);
 
   const handleSetupConfig = useCallback(() => {
-    // For DsiEMVManagerModule, config is handled in initialize, so just log
-    appendLog('initialize', 'DsiEMVManagerBridge initialized');
+    try {
+      DsiEMVManagerBridge.pingConfig();
+      appendLog('pingConfig', 'Called pingConfig()');
+    } catch (e) {
+      appendLog('error', `pingConfig failed: ${(e as Error).message}`);
+    }
   }, [appendLog]);
 
   const handleStartSale = useCallback(() => {
