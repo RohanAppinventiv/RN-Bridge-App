@@ -124,4 +124,5 @@ dependencies {
         implementation jscFlavor
     }
     implementation project(":emvlib")
+    implementation project(":emvCardReaderLib")
 }

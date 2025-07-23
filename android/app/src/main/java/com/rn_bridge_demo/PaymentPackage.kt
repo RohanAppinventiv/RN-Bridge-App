@@ -7,7 +7,10 @@ import com.facebook.react.uimanager.ViewManager
 
 class EMVPaymentPackage : ReactPackage {
     override fun createNativeModules(reactContext: ReactApplicationContext): List<NativeModule> {
-        return listOf(EMVPaymentModule(reactContext))
+        return listOf(
+            EMVPaymentModule(reactContext),
+            DsiEMVManagerModule(reactContext) // Register the new bridge
+        )
     }
 
     override fun createViewManagers(reactContext: ReactApplicationContext): List<ViewManager<*, *>> {

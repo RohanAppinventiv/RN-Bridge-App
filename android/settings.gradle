@@ -5,3 +5,4 @@ rootProject.name = 'RN_Bridge_Demo'
 include ':app'
 includeBuild('../node_modules/@react-native/gradle-plugin')
 include ':emvlib'
+include ':emvCardReaderLib'
