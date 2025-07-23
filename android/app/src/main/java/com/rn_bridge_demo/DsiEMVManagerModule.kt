@@ -44,7 +44,7 @@ class DsiEMVManagerModule(private val reactContext: ReactApplicationContext) :
     }
 
     @ReactMethod
-    fun checkConfig() {
+    fun setupConfig() {
         CoroutineScope(Dispatchers.Main).launch {
             dsiEMVManager?.checkConfig()
         }

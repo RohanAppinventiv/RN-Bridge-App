@@ -9,6 +9,8 @@ import {
   StyleSheet,
   Alert,
   Platform,
+  ActivityIndicator,
+  TouchableOpacity,
 } from 'react-native';
 
 const { DsiEMVManagerBridge } = NativeModules;
@@ -24,10 +26,20 @@ const EVENT_NAMES = [
   'onConfigCompleted',
 ];
 
+const TickIcon = () => (
+  <Text style={{ color: 'green', fontSize: 18, marginRight: 6 }}>✔️</Text>
+);
+const CrossIcon = () => (
+  <Text style={{ color: 'red', fontSize: 18, marginRight: 6 }}>❌</Text>
+);
+
 const EMVPaymentScreen: React.FC = () => {
   const [logs, setLogs] = useState<CallbackLog[]>([]);
+  const [isDeviceConnected, setIsDeviceConnected] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
   const eventEmitterRef = useRef<NativeEventEmitter | null>(null);
   const listenersRef = useRef<{ [event: string]: any }>({});
+  const waitingForEvent = useRef(false);
 
   const appendLog = useCallback((type: string, payload: any) => {
     setLogs((prev) => [
@@ -40,6 +52,7 @@ const EMVPaymentScreen: React.FC = () => {
     ]);
   }, []);
 
+  // Call pingConfig on mount only once
   useEffect(() => {
     if (!DsiEMVManagerBridge) {
       Alert.alert('Native module DsiEMVManagerBridge not found');
@@ -58,14 +71,35 @@ const EMVPaymentScreen: React.FC = () => {
         appendLog(event, payload);
         if (event === 'onConfigPingSuccess') {
           appendLog('pingConfigResponse', 'Ping config succeeded');
+          setIsDeviceConnected(true);
+          setLoading(false);
+          waitingForEvent.current = false;
         } else if (event === 'onConfigPingFailed') {
           appendLog('pingConfigResponse', 'Ping config failed');
+          setIsDeviceConnected(false);
+          setLoading(false);
+          waitingForEvent.current = false;
+        } else if (event === 'onConfigCompleted') {
+          setIsDeviceConnected(true);
+          setLoading(false);
+          waitingForEvent.current = false;
+        } else if (event === 'onConfigError') {
+          setIsDeviceConnected(false);
+          setLoading(false);
+          waitingForEvent.current = false;
+        } else if (waitingForEvent.current) {
+          // Any other event ends loader
+          setLoading(false);
+          waitingForEvent.current = false;
         }
       });
     });
 
     // Initialize the native module on mount
     // DsiEMVManagerBridge.initialize();
+    setLoading(true);
+    waitingForEvent.current = true;
+    DsiEMVManagerBridge.pingConfig();
 
     return () => {
       Object.values(listenersRef.current).forEach((listener) => {
@@ -80,40 +114,70 @@ const EMVPaymentScreen: React.FC = () => {
     };
   }, [appendLog]);
 
+  // Setup Config CTA handler
   const handleSetupConfig = useCallback(() => {
     try {
-      DsiEMVManagerBridge.pingConfig();
-      appendLog('pingConfig', 'Called pingConfig()');
+      setLoading(true);
+      waitingForEvent.current = true;
+      DsiEMVManagerBridge.setupConfig && DsiEMVManagerBridge.setupConfig();
+      appendLog('setupConfig', 'Called setupConfig()');
     } catch (e) {
-      appendLog('error', `pingConfig failed: ${(e as Error).message}`);
+      setLoading(false);
+      waitingForEvent.current = false;
+      appendLog('error', `setupConfig failed: ${(e as Error).message}`);
     }
   }, [appendLog]);
 
   const handleStartSale = useCallback(() => {
     try {
+      setLoading(true);
+      waitingForEvent.current = true;
       DsiEMVManagerBridge.runSaleTransaction('10.50');
       appendLog('runSaleTransaction', 10.5);
     } catch (e) {
+      setLoading(false);
+      waitingForEvent.current = false;
       appendLog('error', `runSaleTransaction failed: ${(e as Error).message}`);
     }
   }, [appendLog]);
 
   const handlePrepaidStripe = useCallback(() => {
     try {
+      setLoading(true);
+      waitingForEvent.current = true;
       DsiEMVManagerBridge.collectCardDetails();
       appendLog('collectCardDetails', 'Requested card details');
     } catch (e) {
+      setLoading(false);
+      waitingForEvent.current = false;
       appendLog('error', `collectCardDetails failed: ${(e as Error).message}`);
     }
   }, [appendLog]);
 
   return (
     <View style={styles.container}>
+      <View style={styles.statusRow}>
+        {isDeviceConnected ? <TickIcon /> : <CrossIcon />}
+        <Text style={[styles.statusLabel, { color: isDeviceConnected ? 'green' : 'red' }]}> 
+          {isDeviceConnected ? 'Connected' : 'Not Connected'}
+        </Text>
+      </View>
+      {loading && (
+        <View style={styles.loaderOverlay}>
+          <ActivityIndicator size="large" color="#007AFF" />
+        </View>
+      )}
       <Text style={styles.title}>EMV Payment Demo</Text>
       <View style={styles.buttonRow}>
-        <Button title="Setup Configuration" onPress={handleSetupConfig} />
-        <Button title="Start EMV Sale" onPress={handleStartSale} />
-        <Button title="Prepaid Stripe Card" onPress={handlePrepaidStripe} />
+        <TouchableOpacity
+          style={[styles.ctaButton, !isDeviceConnected ? styles.ctaButtonEnabled : styles.ctaButtonDisabled]}
+          onPress={handleSetupConfig}
+          disabled={isDeviceConnected || loading}
+        >
+          <Text style={styles.ctaButtonText}>Setup Configuration</Text>
+        </TouchableOpacity>
+        <Button title="Start EMV Sale" onPress={handleStartSale} disabled={loading} />
+        <Button title="Prepaid Stripe Card" onPress={handlePrepaidStripe} disabled={loading} />
       </View>
       <Text style={styles.logTitle}>Event Log</Text>
       <ScrollView style={styles.logArea} contentContainerStyle={styles.logContent}>
@@ -156,6 +220,24 @@ const styles = StyleSheet.create({
     padding: 16,
     backgroundColor: '#FAFAFA',
   },
+  statusRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+    marginTop: 10,
+    alignSelf: 'center',
+  },
+  statusLabel: {
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  loaderOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(255,255,255,0.6)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 10,
+  },
   title: {
     fontSize: 22,
     fontWeight: 'bold',
@@ -166,6 +248,26 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: 18,
+    alignItems: 'center',
+  },
+  ctaButton: {
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    marginRight: 8,
+    minWidth: 120,
+    alignItems: 'center',
+  },
+  ctaButtonEnabled: {
+    backgroundColor: '#007AFF',
+  },
+  ctaButtonDisabled: {
+    backgroundColor: '#CCC',
+  },
+  ctaButtonText: {
+    color: '#FFF',
+    fontWeight: 'bold',
+    fontSize: 14,
   },
   logTitle: {
     fontSize: 16,
