@@ -74,6 +74,21 @@ const EMVPaymentScreen: React.FC = () => {
           setIsDeviceConnected(true);
           setLoading(false);
           waitingForEvent.current = false;
+        } else if (event === 'onSaleTransactionCompleted') {
+          // Log the full payload for debugging
+          console.log('Sale Transaction Completed:', payload);
+
+         // Extract captureStatus and amount.purchase
+          const captureStatus = payload?.captureStatus;
+          const amount = payload?.amount?.purchase;
+
+          appendLog(
+            'saleTransaction',
+            `Sale completed. Capture Status: ${captureStatus}, Amount: ${amount}`
+          );
+
+          setLoading(false);
+          waitingForEvent.current = false;
         } else if (event === 'onConfigPingFailed') {
           appendLog('pingConfigResponse', 'Ping config failed');
           setIsDeviceConnected(false);
@@ -87,11 +102,18 @@ const EMVPaymentScreen: React.FC = () => {
           setIsDeviceConnected(false);
           setLoading(false);
           waitingForEvent.current = false;
+        } else if (event === 'onCardReadSuccessfully') {
+          const binNumber = payload?.binNumber;
+          console.log('Card read successfully with BIN:', binNumber);
+          appendLog('cardRead', 'Card read successfully And BIN: ' + binNumber);
+          setLoading(false);
+          waitingForEvent.current = false;
         } else if (waitingForEvent.current) {
           // Any other event ends loader
           setLoading(false);
           waitingForEvent.current = false;
         }
+        setLoading(false);
       });
     });
 
@@ -132,8 +154,8 @@ const EMVPaymentScreen: React.FC = () => {
     try {
       setLoading(true);
       waitingForEvent.current = true;
-      DsiEMVManagerBridge.runSaleTransaction('10.50');
-      appendLog('runSaleTransaction', 10.5);
+      DsiEMVManagerBridge.runSaleTransaction('1.50');
+      appendLog('runSaleTransaction', 1.5);
     } catch (e) {
       setLoading(false);
       waitingForEvent.current = false;
@@ -162,11 +184,7 @@ const EMVPaymentScreen: React.FC = () => {
           {isDeviceConnected ? 'Connected' : 'Not Connected'}
         </Text>
       </View>
-      {loading && (
-        <View style={styles.loaderOverlay}>
-          <ActivityIndicator size="large" color="#007AFF" />
-        </View>
-      )}
+      
       <Text style={styles.title}>EMV Payment Demo</Text>
       <View style={styles.buttonRow}>
         <TouchableOpacity
@@ -314,4 +332,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default EMVPaymentScreen; 
+export default EMVPaymentScreen;

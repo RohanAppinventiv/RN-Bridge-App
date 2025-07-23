@@ -51,7 +51,7 @@ class DsiEMVManager(
     suspend fun collectCardDetails() = withContext(Dispatchers.IO) {
         resetPinPad()
         posTransactionExecutor.collectCardData()
-        currentPosState == CrState.PrePaidCardDataCollect
+        currentPosState = CrState.PrePaidCardDataCollect
     }
 
     private suspend fun downloadConfigParams() = withContext(Dispatchers.IO) {
