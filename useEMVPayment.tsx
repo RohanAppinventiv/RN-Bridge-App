@@ -207,7 +207,12 @@ const useEMVPayment = () => {
         clearTransactionListener,
         subscribeToEvent,
         unsubscribeFromEvent,
-        EVENTS: EVENT_NAMES
+        EVENTS: Object.freeze(
+            EVENT_NAMES.reduce((acc: Record<string, string>, name) => {
+                acc[name] = name;
+                return acc;
+            }, {})
+        )
     };
 };
 
