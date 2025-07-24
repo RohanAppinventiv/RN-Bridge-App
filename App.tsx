@@ -1,8 +1,6 @@
 
-import useEMVPayment from './useEMVPayment';
+import MainScreen from './MainScreen';
 
 export default function App() {
-  return {
-    useEMVPayment
-  };
+  return <MainScreen />;
 }
