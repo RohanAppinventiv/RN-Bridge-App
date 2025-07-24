@@ -362,8 +362,8 @@ const EMVPaymentScreen: React.FC = () => {
     logs,
     isDeviceConnected,
     loading,
-    runSaleTransaction,
-    collectCardDetails,
+    handleCardPayment,
+    handleInHousePayment,
     setupConfig,
   } = useEMVPayment();
 
@@ -387,8 +387,8 @@ const EMVPaymentScreen: React.FC = () => {
           <Text style={styles.ctaButtonText}>Setup Configuration</Text>
         </TouchableOpacity>
 
-        <Button title="Start EMV Sale" onPress={() => runSaleTransaction('1.50')} disabled={loading} />
-        <Button title="Prepaid Stripe Card" onPress={collectCardDetails} disabled={loading} />
+        <Button title="Start EMV Sale" onPress={() => handleCardPayment('1.50')} disabled={loading} />
+        <Button title="Prepaid Stripe Card" onPress={handleInHousePayment} disabled={loading} />
       </View>
 
       {loading && (
