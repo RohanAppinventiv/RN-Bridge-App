@@ -1,0 +1,25 @@
+{
+    "compilerOptions": {
+        "target": "ES2015",
+        "module": "CommonJS",
+        "declaration": true,
+        "outDir": "lib",
+        "strict": true,
+        "jsx": "react",
+        "esModuleInterop": true,
+        "moduleResolution": "node",
+        "skipLibCheck": true
+    },
+    "include": [
+        "src",
+        "index.js",
+        "index.ts"
+    ],
+    "exclude": [
+        "node_modules",
+        "android",
+        "ios",
+        "lib",
+        "**/*.test.tsx"
+    ]
+}

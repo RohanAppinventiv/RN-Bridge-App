@@ -1,0 +1,40 @@
+{
+    "name": "@ankit628792/react-native-emv-payment",
+    "version": "1.0.5",
+    "description": "React Native SDK for EMV payment using native Android modules",
+    "main": "lib/index.js",
+    "types": "lib/index.d.ts",
+    "react-native": "index.ts",
+    "files": [
+        "android",
+        "src",
+        "index.ts",
+        "lib",
+        "react-native.config.js",
+        "README.md"
+    ],
+    "scripts": {
+        "build": "tsc",
+        "prepare": "npm run build"
+    },
+    "keywords": [
+        "react-native",
+        "emv",
+        "payment",
+        "sdk",
+        "native-modules"
+    ],
+    "author": "Ankit Kumar",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/RohanAppinventiv/RN-Bridge-App.git"
+    },
+    "peerDependencies": {
+        "react": ">=17.0.0",
+        "react-native": ">=0.68.0"
+    },
+    "devDependencies": {
+        "typescript": "^5.0.0"
+    }
+}
