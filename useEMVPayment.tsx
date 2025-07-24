@@ -105,7 +105,7 @@ const useEMVPayment = () => {
                     const binNumber = payload?.binNumber;
                     appendLog('cardRead', 'Card read successfully And BIN: ' + binNumber);
                 }
-                setLoading(false);
+                setLoading(() => false);
                 waitingForEvent.current = false;
             });
 

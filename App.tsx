@@ -1,7 +1,8 @@
-import React from 'react';
-import MainScreen from './MainScreen';
+
+import useEMVPayment from './useEMVPayment';
 
 export default function App() {
-  
-  return <MainScreen />;
+  return {
+    useEMVPayment
+  };
 }
