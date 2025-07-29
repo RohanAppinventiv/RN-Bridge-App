@@ -1,0 +1,13 @@
+include(":emvNative", ":emvlib", ":emvCardReaderLib")
+
+project(":emvNative").projectDir = file("node_modules/react-native-emv-payment/android/emvNative")
+project(":emvlib").projectDir = file("node_modules/react-native-emv-payment/android/emvlib")
+project(":emvCardReaderLib").projectDir = file("node_modules/react-native-emv-payment/android/emvCardReaderLib")
+
+dependencyResolutionManagement {
+    repositories {
+        google()
+        mavenCentral()
+        maven { url = uri("https://oss.sonatype.org/content/repositories/snapshots/") }
+    }
+}
