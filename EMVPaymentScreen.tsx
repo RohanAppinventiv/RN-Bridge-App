@@ -9,7 +9,7 @@ import {
   TouchableOpacity,
   ActivityIndicator,
 } from 'react-native';
-import useEMVPayment from './useEMVPayment';
+import { useEMVPayment } from './useEMVPayment';
 
 const TickIcon = () => (
   <Text style={{ color: 'green', fontSize: 18, marginRight: 6 }}>✔️</Text>

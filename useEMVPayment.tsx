@@ -1,9 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { NativeEventEmitter, NativeModules, Platform } from 'react-native';
 
-const { DsiEMVManagerBridge } = NativeModules;
-
-const EVENT_NAMES = [
+export const EVENT_NAMES = [
     'onError',
     'onCardReadSuccessfully',
     'onSaleTransactionCompleted',
@@ -12,15 +10,33 @@ const EVENT_NAMES = [
     'onConfigPingFailed',
     'onConfigPingSuccess',
     'onConfigCompleted',
-];
+] as const;
 
-interface CallbackLog {
+export type EMVEventName = typeof EVENT_NAMES[number];
+
+export interface CallbackLog {
     type: string;
     payload: any;
     timestamp: number;
 }
 
-const useEMVPayment = () => {
+export interface EMVPaymentHook {
+    logs: CallbackLog[];
+    isDeviceConnected: boolean;
+    loading: boolean;
+    handleCardPayment: (amount: string) => void;
+    handleInHousePayment: () => void;
+    setupConfig: () => void;
+    pingConfig: () => void;
+    clearTransactionListener: () => void;
+    subscribeToEvent: (eventName: EMVEventName, callback: (payload: any) => void) => void;
+    unsubscribeFromEvent: (eventName: EMVEventName, callback: (payload: any) => void) => void;
+    EVENTS: Record<EMVEventName, EMVEventName>;
+}
+
+export const useEMVPayment = (): EMVPaymentHook => {
+    const { DsiEMVManagerBridge } = NativeModules;
+
     const [logs, setLogs] = useState<CallbackLog[]>([]);
     const [isDeviceConnected, setIsDeviceConnected] = useState<boolean>(false);
     const [loading, setLoading] = useState<boolean>(false);
@@ -195,7 +211,6 @@ const useEMVPayment = () => {
         }
     }, [appendLog]);
 
-    // Return only the exported functions
     return {
         logs,
         isDeviceConnected,
@@ -208,12 +223,10 @@ const useEMVPayment = () => {
         subscribeToEvent,
         unsubscribeFromEvent,
         EVENTS: Object.freeze(
-            EVENT_NAMES.reduce((acc: Record<string, string>, name) => {
+            EVENT_NAMES.reduce((acc: Record<EMVEventName, EMVEventName>, name) => {
                 acc[name] = name;
                 return acc;
-            }, {})
+            }, {} as Record<EMVEventName, EMVEventName>)
         )
     };
 };
-
-export default useEMVPayment;
