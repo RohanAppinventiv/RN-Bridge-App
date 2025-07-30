@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, Button, StyleSheet } from 'react-native';
-import EMVPaymentScreen from './EMVPaymentScreen';
+import EMVPaymentScreen from './src/tabletExample/EMVPaymentScreen';
 
 const MainScreen: React.FC = () => {
   const [showEMV, setShowEMV] = useState(false);

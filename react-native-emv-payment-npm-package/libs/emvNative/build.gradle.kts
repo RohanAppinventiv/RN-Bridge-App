@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.react_native_emv_payment"
+    namespace = "com.rn_bridge"
     compileSdk = 34
 
     defaultConfig {
