@@ -8,7 +8,9 @@
     "lint": "eslint .",
     "start": "react-native start",
     "clean": "cd android && ./gradlew clean && cd ..",
-    "test": "jest"
+    "test": "jest",
+    "generate-package": "./generate-package.sh",
+    "publish-package": "cd react-native-emv-payment && npm publish --access public"
   },
   "dependencies": {
     "@react-native-community/blur": "^4.4.1",

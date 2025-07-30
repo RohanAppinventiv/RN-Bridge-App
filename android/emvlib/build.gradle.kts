@@ -5,11 +5,10 @@ plugins {
 
 android {
     namespace = "com.quivioedge.emvlib"
-    compileSdk = 35
+    compileSdk = 34
 
     defaultConfig {
-        minSdk = 26
-        targetSdk = 35
+       minSdk = 23
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
