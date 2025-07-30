@@ -1,6 +1,6 @@
 {
     "name": "react-native-emv-payment",
-    "version": "1.1.15",
+    "version": "1.1.16",
     "description": "React Native hook for EMV payment integration with DataCap",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",

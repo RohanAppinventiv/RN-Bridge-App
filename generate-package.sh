@@ -10,6 +10,12 @@ echo "Starting package generation..."
 # Define the target directory
 TARGET_DIR="react-native-emv-payment"
 
+# Bump version in package_base_folder
+echo "Bumping version in package_base_folder..."
+cd package_base_folder
+npm version patch
+cd ..
+
 # Remove target directory if it exists
 if [ -d "$TARGET_DIR" ]; then
     echo "Removing existing $TARGET_DIR directory..."
