@@ -261,6 +261,20 @@ export const useEMVPayment = (): EMVPaymentHook => {
         }
     }, [appendLog]);
 
+    // Cancel current operation
+    const cancelOperation = useCallback(() => {
+        try {
+            DsiEMVManagerBridge.cancelTransaction();
+            setLoading(false);
+            waitingForEvent.current = false;
+            appendLog('cancelOperation', 'Operation cancelled by user');
+        } catch (e) {
+            setLoading(false);
+            waitingForEvent.current = false;
+            appendLog('error', `cancelOperation failed: ${(e as Error).message}`);
+        }
+    }, [appendLog]);
+
     return {
         logs,
         isDeviceConnected,
@@ -272,6 +286,7 @@ export const useEMVPayment = (): EMVPaymentHook => {
         pingConfig,
         clearTransactionListener,
         clearAllTransactions,
+        cancelOperation,
         initializeEMV,
         subscribeToEvent,
         unsubscribeFromEvent,

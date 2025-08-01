@@ -69,6 +69,14 @@ class DsiEMVManagerModule(private val reactContext: ReactApplicationContext) :
         dsiEMVManager?.clearTransactionListener()
     }
 
+    @ReactMethod
+    fun cancelTransaction() {
+        Log.d("DsiEMVManagerModule", "cancelTransaction called")
+        CoroutineScope(Dispatchers.Main).launch {
+            dsiEMVManager?.cancelTransaction()
+        }
+    }
+
 
     // ConfigurationCommunicator callbacks
     override fun onConfigError(errorMessage: String) {

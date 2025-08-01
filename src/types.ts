@@ -28,6 +28,7 @@ export interface EMVPaymentHook {
     pingConfig: () => void;
     clearTransactionListener: () => void;
     clearAllTransactions: () => void;
+    cancelOperation: () => void;
     initializeEMV: () => void;
     subscribeToEvent: (eventName: EMVEventName, callback: (payload: any) => void) => void;
     unsubscribeFromEvent: (eventName: EMVEventName, callback: (payload: any) => void) => void;
