@@ -23,13 +23,22 @@ const EMVPaymentScreen: React.FC = () => {
     logs,
     isDeviceConnected,
     loading,
+    isInitialized,
     handleCardPayment,
     handleInHousePayment,
     setupConfig,
+    clearAllTransactions,
   } = useEMVPayment();
 
   return (
     <View style={styles.container}>
+      <View style={styles.statusRow}>
+        {isInitialized ? <TickIcon /> : <CrossIcon />}
+        <Text style={[styles.statusLabel, { color: isInitialized ? 'green' : 'red' }]}>
+          {isInitialized ? 'Initialized' : 'Not Initialized'}
+        </Text>
+      </View>
+      
       <View style={styles.statusRow}>
         {isDeviceConnected ? <TickIcon /> : <CrossIcon />}
         <Text style={[styles.statusLabel, { color: isDeviceConnected ? 'green' : 'red' }]}>
@@ -45,11 +54,36 @@ const EMVPaymentScreen: React.FC = () => {
           onPress={setupConfig}
           disabled={isDeviceConnected || loading}
         >
-          <Text style={styles.ctaButtonText}>Setup Configuration</Text>
+          <Text style={styles.ctaButtonText}>
+            {isDeviceConnected ? 'Configuration Ready' : 'Setup Configuration'}
+          </Text>
         </TouchableOpacity>
 
-        <Button title="Start EMV Sale" onPress={() => handleCardPayment('1.50')} disabled={loading} />
-        <Button title="Prepaid Stripe Card" onPress={handleInHousePayment} disabled={loading} />
+        <TouchableOpacity
+          style={[styles.ctaButton, (loading || !isDeviceConnected) ? styles.ctaButtonDisabled : styles.ctaButtonEnabled]}
+          onPress={() => handleCardPayment('1.50')}
+          disabled={loading || !isDeviceConnected}
+        >
+          <Text style={styles.ctaButtonText}>Pay via EMV Sale</Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity
+          style={[styles.ctaButton, (loading || !isDeviceConnected) ? styles.ctaButtonDisabled : styles.ctaButtonEnabled]}
+          onPress={handleInHousePayment}
+          disabled={loading || !isDeviceConnected}
+        >
+          <Text style={styles.ctaButtonText}>Pay via In-house</Text>
+        </TouchableOpacity>
+      </View>
+
+      <View style={styles.buttonRow}>
+        <TouchableOpacity
+          style={[styles.ctaButton, loading ? styles.ctaButtonDisabled : styles.ctaButtonEnabled]}
+          onPress={clearAllTransactions}
+          disabled={loading}
+        >
+          <Text style={styles.ctaButtonText}>Clear All</Text>
+        </TouchableOpacity>
       </View>
 
       {loading && (

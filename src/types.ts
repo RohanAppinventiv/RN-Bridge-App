@@ -21,11 +21,14 @@ export interface EMVPaymentHook {
     logs: CallbackLog[];
     isDeviceConnected: boolean;
     loading: boolean;
+    isInitialized: boolean;
     handleCardPayment: (amount: string) => void;
     handleInHousePayment: () => void;
     setupConfig: () => void;
     pingConfig: () => void;
     clearTransactionListener: () => void;
+    clearAllTransactions: () => void;
+    initializeEMV: () => void;
     subscribeToEvent: (eventName: EMVEventName, callback: (payload: any) => void) => void;
     unsubscribeFromEvent: (eventName: EMVEventName, callback: (payload: any) => void) => void;
     EVENTS: Record<EMVEventName, EMVEventName>;

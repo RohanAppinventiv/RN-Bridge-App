@@ -20,6 +20,6 @@ android {
 }
 
 dependencies {
-    implementation(files("libs/dsiEMVAndroid.aar"))
+    compileOnly(files("../app/libs/dsiEMVAndroid.aar"))
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
 } 

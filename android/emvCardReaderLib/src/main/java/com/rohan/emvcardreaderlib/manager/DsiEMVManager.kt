@@ -61,6 +61,10 @@ class DsiEMVManager(
         posTransactionExecutor.downloadConfig()
     }
 
+    suspend fun cancelTransaction(){
+        posTransactionExecutor.cancelTransaction()
+    }
+
     suspend fun runSaleTransaction(amount: String) = withContext(Dispatchers.IO) {
         resetPinPad()
         posTransactionExecutor.doSale(amount)
@@ -78,6 +82,7 @@ class DsiEMVManager(
 
     fun clearTransactionListener() {
         this.communicator = null
+        this.configCommunicator = null
         posTransactionExecutor.clearAllListeners()
     }
 

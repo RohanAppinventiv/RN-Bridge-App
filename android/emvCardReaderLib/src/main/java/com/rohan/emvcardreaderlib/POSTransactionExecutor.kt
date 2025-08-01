@@ -34,6 +34,10 @@ class POSTransactionExecutor(context: Context, posConfig: ConfigFactory) {
         }
     }
 
+    suspend fun cancelTransaction(){
+        dsiEMVAndroidLib.CancelRequest()
+    }
+
     suspend fun downloadConfig(){
         withContext(Dispatchers.IO){
             Log.d(PRINT_TAG, "Inside downloadConfig()")

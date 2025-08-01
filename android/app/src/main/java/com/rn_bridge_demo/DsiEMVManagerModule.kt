@@ -25,10 +25,12 @@ class DsiEMVManagerModule(private val reactContext: ReactApplicationContext) :
 
     @ReactMethod
     fun initialize(map: ReadableMap) {
+        Log.d("DsiEMVManagerModule", "initialize called with config: $map")
         val config = POSConfigFactory.processMap(map)
         val context = currentActivity ?: reactContext
         dsiEMVManager = DsiEMVManager(context, config)
         dsiEMVManager?.registerListener(this, this)
+        Log.d("DsiEMVManagerModule", "initialize completed")
     }
 
     @ReactMethod
@@ -47,6 +49,7 @@ class DsiEMVManagerModule(private val reactContext: ReactApplicationContext) :
 
     @ReactMethod
     fun setupConfig() {
+        Log.d("DsiEMVManagerModule", "setupConfig called")
         CoroutineScope(Dispatchers.Main).launch {
             dsiEMVManager?.checkConfig()
         }
@@ -54,6 +57,7 @@ class DsiEMVManagerModule(private val reactContext: ReactApplicationContext) :
 
     @ReactMethod
     fun pingConfig() {
+        Log.d("DsiEMVManagerModule", "pingConfig called")
         CoroutineScope(Dispatchers.Main).launch {
             dsiEMVManager?.pingConfig()
         }
@@ -61,15 +65,40 @@ class DsiEMVManagerModule(private val reactContext: ReactApplicationContext) :
 
     @ReactMethod
     fun clearTransactionListener() {
+        Log.d("DsiEMVManagerModule", "clearTransactionListener called")
         dsiEMVManager?.clearTransactionListener()
+    }
+
+
+    // ConfigurationCommunicator callbacks
+    override fun onConfigError(errorMessage: String) {
+        Log.d("DsiEMVManagerModule", "onConfigError: $errorMessage")
+        sendEvent("onConfigError", errorMessage)
+    }
+
+    override fun onConfigPingFailed() {
+        Log.d("DsiEMVManagerModule", "onConfigPingFailed")
+        sendEvent("onConfigPingFailed", null)
+    }
+
+    override fun onConfigPingSuccess() {
+        Log.d("DsiEMVManagerModule", "onConfigPingSuccess")
+        sendEvent("onConfigPingSuccess", null)
+    }
+
+    override fun onConfigCompleted() {
+        Log.d("DsiEMVManagerModule", "onConfigCompleted")
+        sendEvent("onConfigCompleted", null)
     }
 
     // EMVTransactionCommunicator callbacks
     override fun onError(errorMessage: String) {
+        Log.d("DsiEMVManagerModule", "onError: $errorMessage")
         sendEvent("onError", errorMessage)
     }
 
     override fun onCardReadSuccessfully(cardData: CardData) {
+        Log.d("DsiEMVManagerModule", "onCardReadSuccessfully: ${cardData.binNumber}")
         val map = Arguments.createMap().apply {
             putString("binNumber", cardData.binNumber)
         }
@@ -77,6 +106,7 @@ class DsiEMVManagerModule(private val reactContext: ReactApplicationContext) :
     }
 
     override fun onSaleTransactionCompleted(saleDetails: SaleTransactionResponse) {
+        Log.d("DsiEMVManagerModule", "onSaleTransactionCompleted")
         val map = Arguments.createMap().apply {
             putString("merchantID", saleDetails.merchantID)
             putString("acctNo", saleDetails.acctNo)
@@ -103,27 +133,12 @@ class DsiEMVManagerModule(private val reactContext: ReactApplicationContext) :
     }
 
     override fun onShowMessage(message: String) {
+        Log.d("DsiEMVManagerModule", "onShowMessage: $message")
         sendEvent("onShowMessage", message)
     }
 
-    // ConfigurationCommunicator callbacks
-    override fun onConfigError(errorMessage: String) {
-        sendEvent("onConfigError", errorMessage)
-    }
-
-    override fun onConfigPingFailed() {
-        sendEvent("onConfigPingFailed", null)
-    }
-
-    override fun onConfigPingSuccess() {
-        sendEvent("onConfigPingSuccess", null)
-    }
-
-    override fun onConfigCompleted() {
-        sendEvent("onConfigCompleted", null)
-    }
-
     private fun sendEvent(eventName: String, params: Any?) {
+        Log.d("DsiEMVManagerModule", "sendEvent: $eventName with params: $params")
         reactContext
             .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter::class.java)
             .emit(eventName, params)
