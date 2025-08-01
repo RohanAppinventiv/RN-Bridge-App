@@ -23,9 +23,11 @@ class DsiEMVManagerModule(private val reactContext: ReactApplicationContext) :
 
     override fun getName() = NAME
 
-    override fun initialize() {
+    @ReactMethod
+    fun initialize(map: ReadableMap) {
+        val config = POSConfigFactory.processMap(map)
         val context = currentActivity ?: reactContext
-        dsiEMVManager = DsiEMVManager(context)
+        dsiEMVManager = DsiEMVManager(context, config)
         dsiEMVManager?.registerListener(this, this)
     }
 

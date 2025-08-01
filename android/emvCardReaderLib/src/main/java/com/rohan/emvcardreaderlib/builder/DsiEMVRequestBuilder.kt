@@ -1,19 +1,19 @@
 package com.rohan.emvcardreaderlib.builder
 
-import com.rohan.emvcardreaderlib.Amount
+import com.rohan.emvcardreaderlib.ConfigFactory
 import com.rohan.emvcardreaderlib.TransType
-import java.util.UUID
 
-class DsiEMVRequestBuilder() {
+class DsiEMVRequestBuilder(val config: ConfigFactory) {
 
-    private val merchantID = "SONNYTAMA35000GP"
-    private val operationMode = "CERT"
+    private val merchantID = config.merchantID
+    private val onlineMerchantID = config.onlineMerchantID
+    private val operationMode = if(config.isSandBox) "CERT" else "PROD"
     private var sequenceNo = 10
-    private val secureDevice = "EMV_VP3350_DATACAP"
-    private val bluetoothDevice = "IDTECH-VP3350-11311"
+//    private val secureDevice = "EMV_VP3350_DATACAP"
+    private val secureDevice = config.secureDeviceName
     private val posPackageID = "dsiEMVAndroid:1.0"
 
-    private fun getUserTrace() = UUID.randomUUID()
+    private fun getUserTrace() = config.operatorID
 
     fun nextSequenceNo(): String {
         sequenceNo++
@@ -43,7 +43,6 @@ class DsiEMVRequestBuilder() {
               <TStream>
                 <Transaction>
                 <ComPort>1</ComPort>
-                <BluetoothDeviceName>${bluetoothDevice}</BluetoothDeviceName>
                 <SecureDevice>${secureDevice}</SecureDevice>
                 <SequenceNo>${nextSequenceNo()}</SequenceNo>
                 <UserTrace>${getUserTrace()}</UserTrace>

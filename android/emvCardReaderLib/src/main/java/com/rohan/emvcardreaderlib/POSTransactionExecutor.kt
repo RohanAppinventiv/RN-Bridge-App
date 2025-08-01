@@ -8,13 +8,13 @@ import com.rohan.emvcardreaderlib.builder.DsiEMVRequestBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-class POSTransactionExecutor(context: Context) {
+class POSTransactionExecutor(context: Context, posConfig: ConfigFactory) {
 
     private val dsiEMVAndroidLib  by lazy {
         DsiEMVInstanceBuilder.getInstance(context)
     }
     private val requestBuilder by lazy {
-        DsiEMVRequestBuilder()
+        DsiEMVRequestBuilder(posConfig)
     }
 
     suspend fun doSale(amount: String) {

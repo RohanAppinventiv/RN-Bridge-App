@@ -6,6 +6,7 @@ import com.datacap.android.ProcessTransactionResponseListener
 import com.rohan.emvcardreaderlib.BridgeCommunicator
 import com.rohan.emvcardreaderlib.CRTransactionResponse
 import com.rohan.emvcardreaderlib.CardData
+import com.rohan.emvcardreaderlib.ConfigFactory
 import com.rohan.emvcardreaderlib.ConfigurationCommunicator
 import com.rohan.emvcardreaderlib.CrState
 import com.rohan.emvcardreaderlib.EMVTransactionCommunicator
@@ -19,14 +20,15 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class DsiEMVManager(
-    val context: Context
+    val context: Context,
+    posConfig: ConfigFactory
 ) {
     private var currentPosState: CrState = CrState.IDLE
     private var communicator: EMVTransactionCommunicator? = null
     private var configCommunicator: ConfigurationCommunicator? = null
 
     private val posTransactionExecutor by lazy {
-        POSTransactionExecutor(context)
+        POSTransactionExecutor(context, posConfig)
     }
 
     private val posResponseExtractor by lazy {
