@@ -1,4 +1,4 @@
-# react-native-emv-payment
+# quivio-transaction-processor
 
 A React Native hook for EMV payment integration with DataCap. This package provides a simple and efficient way to integrate EMV card reader functionality into your React Native Android applications.
 
@@ -14,9 +14,9 @@ A React Native hook for EMV payment integration with DataCap. This package provi
 ## Installation
 
 ```bash
-npm install react-native-emv-payment
+npm install quivio-transaction-processor
 # or
-yarn add react-native-emv-payment
+yarn add quivio-transaction-processor
 ```
 
 ### Android Setup
@@ -29,11 +29,11 @@ Add the following lines to your `android/settings.gradle`:
 
 ```gradle
 include ':emvlib'
-project(':emvlib').projectDir = file('../node_modules/react-native-emv-payment/libs/emvlib')
+project(':emvlib').projectDir = file('../node_modules/quivio-transaction-processor/libs/emvlib')
 include ':emvCardReaderLib'
-project(':emvCardReaderLib').projectDir = file('../node_modules/react-native-emv-payment/libs/emvCardReaderLib')
+project(':emvCardReaderLib').projectDir = file('../node_modules/quivio-transaction-processor/libs/emvCardReaderLib')
 include ':emvNative'
-project(':emvNative').projectDir = file('../node_modules/react-native-emv-payment/libs/emvNative')
+project(':emvNative').projectDir = file('../node_modules/quivio-transaction-processor/libs/emvNative')
 ```
 
 #### 2. Update app/build.gradle
@@ -86,7 +86,7 @@ Make sure you have the necessary permissions in your `android/app/src/main/Andro
 ```tsx
 import React from 'react';
 import { View, Text, Button } from 'react-native';
-import { useEMVPayment } from 'react-native-emv-payment';
+import { useEMVPayment } from 'quivio-transaction-processor';
 
 const PaymentScreen = () => {
   const {
@@ -124,7 +124,7 @@ const PaymentScreen = () => {
 ```tsx
 import React, { useEffect } from 'react';
 import { View, Text, Button } from 'react-native';
-import { useEMVPayment } from 'react-native-emv-payment';
+import { useEMVPayment } from 'quivio-transaction-processor';
 
 const AdvancedPaymentScreen = () => {
   const {
