@@ -54,7 +54,7 @@ dependencies {
 Add the import and package registration to your `android/app/src/main/java/com/your-app/MainApplication.kt`:
 
 ```kotlin
-import com.rn_bridge_demo.EMVPaymentPackage
+import com.quivio_transaction_processor.EMVPaymentPackage
 
 class MainApplication : Application(), ReactApplication {
     private val mReactNativeHost = object : ReactNativeHost(this) {

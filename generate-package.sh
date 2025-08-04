@@ -76,12 +76,12 @@ fi
 
 # Remove specific files that shouldn't be in the package
 echo "Removing specific files..."
-if [ -f "$TARGET_DIR/libs/emvNative/src/main/java/com/rn_bridge_demo/MainActivity.kt" ]; then
-    rm "$TARGET_DIR/libs/emvNative/src/main/java/com/rn_bridge_demo/MainActivity.kt"
+if [ -f "$TARGET_DIR/libs/emvNative/src/main/java/com/quivio_transaction_processor/MainActivity.kt" ]; then
+    rm "$TARGET_DIR/libs/emvNative/src/main/java/com/quivio_transaction_processor/MainActivity.kt"
     echo "Removed MainActivity.kt file"
 fi
-if [ -f "$TARGET_DIR/libs/emvNative/src/main/java/com/rn_bridge_demo/MainApplication.kt" ]; then
-    rm "$TARGET_DIR/libs/emvNative/src/main/java/com/rn_bridge_demo/MainApplication.kt"
+if [ -f "$TARGET_DIR/libs/emvNative/src/main/java/com/quivio_transaction_processor/MainApplication.kt" ]; then
+    rm "$TARGET_DIR/libs/emvNative/src/main/java/com/quivio_transaction_processor/MainApplication.kt"
     echo "Removed MainApplication.kt file"
 fi
 

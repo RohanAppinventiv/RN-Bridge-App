@@ -11,7 +11,7 @@ const MainScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Welcome to RN Bridge Demo</Text>
+      <Text style={styles.title}>Welcome to Quivio Transaction Processor</Text>
       <Text style={styles.subtitle}>Select a feature to begin:</Text>
       <View style={styles.buttonContainer}>
         <Button

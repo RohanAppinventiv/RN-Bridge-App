@@ -1,4 +1,4 @@
-package com.rn_bridge_demo
+package com.quivio_transaction_processor
 
 import android.util.Log
 import com.facebook.react.bridge.*

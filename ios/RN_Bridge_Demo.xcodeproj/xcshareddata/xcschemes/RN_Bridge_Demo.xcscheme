@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-               BuildableName = "RN_Bridge_Demo.app"
-               BlueprintName = "RN_Bridge_Demo"
-               ReferencedContainer = "container:RN_Bridge_Demo.xcodeproj">
+               BuildableName = "Quivio_Transaction_Processor.app"
+               BlueprintName = "Quivio_Transaction_Processor"
+               ReferencedContainer = "container:Quivio_Transaction_Processor.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -33,9 +33,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "00E356ED1AD99517003FC87E"
-               BuildableName = "RN_Bridge_DemoTests.xctest"
-               BlueprintName = "RN_Bridge_DemoTests"
-               ReferencedContainer = "container:RN_Bridge_Demo.xcodeproj">
+               BuildableName = "Quivio_Transaction_ProcessorTests.xctest"
+               BlueprintName = "Quivio_Transaction_ProcessorTests"
+               ReferencedContainer = "container:Quivio_Transaction_Processor.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -55,9 +55,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "RN_Bridge_Demo.app"
-            BlueprintName = "RN_Bridge_Demo"
-            ReferencedContainer = "container:RN_Bridge_Demo.xcodeproj">
+            BuildableName = "Quivio_Transaction_Processor.app"
+            BlueprintName = "Quivio_Transaction_Processor"
+            ReferencedContainer = "container:Quivio_Transaction_Processor.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -72,9 +72,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "RN_Bridge_Demo.app"
-            BlueprintName = "RN_Bridge_Demo"
-            ReferencedContainer = "container:RN_Bridge_Demo.xcodeproj">
+            BuildableName = "Quivio_Transaction_Processor.app"
+            BlueprintName = "Quivio_Transaction_Processor"
+            ReferencedContainer = "container:Quivio_Transaction_Processor.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>
