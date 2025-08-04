@@ -1,10 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { NativeEventEmitter, NativeModules, Platform } from 'react-native';
-import { CallbackLog, EMVEventName, EMVPaymentHook, EVENT_NAMES } from './types';
+import { CallbackLog, EMVEventName, EMVPaymentHook, EVENT_NAMES, EMVConfig } from './types';
 
-
-
-export const useEMVPayment = (): EMVPaymentHook => {
+export const useEMVPayment = (config: EMVConfig): EMVPaymentHook => {
     const { DsiEMVManagerBridge } = NativeModules;
 
     const [logs, setLogs] = useState<CallbackLog[]>([]);
@@ -36,26 +34,17 @@ export const useEMVPayment = (): EMVPaymentHook => {
         try {
             setLoading(true);
             waitingForEvent.current = true;
-            
-            // Configuration data for EMV initialization
-            const config = {
-                merchantID: "SONNYTAMA35000GP",
-                onlineMerchantID: "SONNYTAMA35000EP",
-                isSandBox: true, // true for testing, false for production
-                secureDeviceName: "EMV_VP3350_DATACAP", // Terminal device name
-                operatorID: "001" // Employee ID
-            };
 
             DsiEMVManagerBridge.initialize(config);
             appendLog('initialize', `EMV initialized with config: ${JSON.stringify(config)}`);
             setIsInitialized(true);
-            
+
         } catch (e) {
             setLoading(false);
             waitingForEvent.current = false;
             appendLog('error', `initialize failed: ${(e as Error).message}`);
         }
-    }, [isInitialized, appendLog]);
+    }, [isInitialized, appendLog, config]);
 
     // Event subscription functions
     const subscribeToEvent = useCallback((eventName: string, callback: (payload: any) => void) => {
@@ -101,7 +90,7 @@ export const useEMVPayment = (): EMVPaymentHook => {
             const listener = emitter.addListener(event, (payload: any) => {
                 console.log(`React Native received event: ${event}`, payload);
                 appendLog(event, payload);
-                
+
                 // Handle ping config responses
                 if (event === 'onConfigPingSuccess') {
                     console.log('Setting device connected to TRUE');
@@ -115,7 +104,7 @@ export const useEMVPayment = (): EMVPaymentHook => {
                     setLoading(false);
                     waitingForEvent.current = false;
                 }
-                
+
                 // Handle setup config responses
                 else if (event === 'onConfigCompleted') {
                     appendLog('setupConfigResponse', 'Setup config completed');
@@ -128,7 +117,7 @@ export const useEMVPayment = (): EMVPaymentHook => {
                     setLoading(false);
                     waitingForEvent.current = false;
                 }
-                
+
                 // Handle other events
                 else if (event === 'onSaleTransactionCompleted') {
                     const captureStatus = payload?.captureStatus;
@@ -163,8 +152,11 @@ export const useEMVPayment = (): EMVPaymentHook => {
         });
 
         // Initialize EMV manager first (only once)
-        initializeEMV();
-        
+        if (config)
+            initializeEMV();
+        else
+            console.error("MISSING CONFIGURATION for INITIALIZATION");
+
         // After initialization, call pingConfig to check connection
         setTimeout(() => {
             pingConfig();
@@ -229,7 +221,7 @@ export const useEMVPayment = (): EMVPaymentHook => {
                 initializeEMV();
                 return;
             }
-            
+
             setLoading(true);
             waitingForEvent.current = true;
             DsiEMVManagerBridge.setupConfig();
