@@ -23,7 +23,13 @@ yarn add quivio-transaction-processor
 
 The package includes native Android libraries that need to be properly configured. Follow these steps:
 
-#### 1. Update settings.gradle
+#### 1. Add dsiEMVAndroid.aar file
+
+First, add the `dsiEMVAndroid.aar` file to your `android/app/libs/` folder. This is a critical step as it contains the core EMV functionality.
+
+**Note**: Make sure the `libs` folder exists in your `android/app/` directory. If it doesn't exist, create it first.
+
+#### 2. Update settings.gradle
 
 Add the following lines to your `android/settings.gradle`:
 
@@ -36,20 +42,23 @@ include ':emvNative'
 project(':emvNative').projectDir = file('../node_modules/quivio-transaction-processor/libs/emvNative')
 ```
 
-#### 2. Update app/build.gradle
+#### 3. Update app/build.gradle
 
 Add the following dependencies to your `android/app/build.gradle`:
 
 ```gradle
 dependencies {
     // ... other dependencies
+    implementation files("libs/dsiEMVAndroid.aar")
     implementation project(":emvlib")
     implementation project(":emvCardReaderLib")
     implementation project(":emvNative")
 }
 ```
 
-#### 3. Update MainApplication.kt
+**Important**: The `implementation files("libs/dsiEMVAndroid.aar")` line is crucial and must be included for the EMV functionality to work.
+
+#### 4. Update MainApplication.kt
 
 Add the import and package registration to your `android/app/src/main/java/com/your-app/MainApplication.kt`:
 
@@ -69,7 +78,7 @@ class MainApplication : Application(), ReactApplication {
 }
 ```
 
-#### 4. Permissions
+#### 5. Permissions
 
 Make sure you have the necessary permissions in your `android/app/src/main/AndroidManifest.xml`:
 
