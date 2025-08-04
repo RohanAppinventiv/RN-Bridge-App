@@ -1,8 +1,8 @@
 include(":emvNative", ":emvlib", ":emvCardReaderLib")
 
-project(":emvNative").projectDir = file("node_modules/react-native-emv-payment/android/emvNative")
-project(":emvlib").projectDir = file("node_modules/react-native-emv-payment/android/emvlib")
-project(":emvCardReaderLib").projectDir = file("node_modules/react-native-emv-payment/android/emvCardReaderLib")
+project(":emvNative").projectDir = file("node_modules/quivio-transaction-processor/android/emvNative")
+project(":emvlib").projectDir = file("node_modules/quivio-transaction-processor/android/emvlib")
+project(":emvCardReaderLib").projectDir = file("node_modules/quivio-transaction-processor/android/emvCardReaderLib")
 
 dependencyResolutionManagement {
     repositories {
