@@ -88,22 +88,23 @@ class DsiEMVRequestBuilder(val config: ConfigFactory) {
         return """<?xml version="1.0"?>
         <TStream>
         <Transaction>
-            <MerchantID>${merchantID}</MerchantID>
-            <OperationMode>${operationMode}</OperationMode>
+            <SequenceNo>${nextSequenceNo()}</SequenceNo>
+            <UserTrace>${getUserTrace()}</UserTrace>
+            <ProcessorToken>TokenRequested</ProcessorToken>
             <POSPackageID>${posPackageID}</POSPackageID>
             <OperatorID>01</OperatorID>
-            <UserTrace>${getUserTrace()}</UserTrace>
-            <CardType>Credit</CardType>
-            <TranCode>${TransType.EMVSale.name}</TranCode>
-            <ProcessorToken>TokenRequested</ProcessorToken>
-            <CollectData>CardholderName</CollectData>
-            <SecureDevice>${secureDevice}</SecureDevice>
+            <PartialAuth>Allow</PartialAuth>
             <InvoiceNo>0003</InvoiceNo>
             <RefNo>0003</RefNo>
-             <Amount>
+            <OperationMode>${operationMode}</OperationMode>
+            <MerchantID>${merchantID}</MerchantID>
+            <SecureDevice>${secureDevice}</SecureDevice>
+            <Amount>
                 <Purchase>${amount}</Purchase>
             </Amount>
-            <SequenceNo>${nextSequenceNo()}</SequenceNo>
+            <TranCode>${TransType.EMVSale.name}</TranCode>
+            <CollectData>CardholderName</CollectData>
+            <CardType>Credit</CardType>
             <Frequency>Recurring</Frequency>
             <RecurringData>Recurring</RecurringData>
             <RecordNo>RecordNumberRequested</RecordNo>

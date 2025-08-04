@@ -74,7 +74,7 @@ class DsiEMVManager(
     suspend fun runRecurringTransaction(amount: String) = withContext(Dispatchers.IO) {
         resetPinPad()
         posTransactionExecutor.doRecurringSale(amount)
-        currentPosState = CrState.SetupRecurringSale
+        currentPosState = CrState.EmvSale
     }
 
     fun registerListener(
@@ -152,9 +152,6 @@ class DsiEMVManager(
                 communicator?.onSaleTransactionCompleted(success.transactionDetails)
             }
 
-            CrState.SetupRecurringSale -> {
-                communicator?.onSaleTransactionCompleted(success.transactionDetails)
-            }
             CrState.PrePaidCardDataCollect -> {
                 communicator?.onCardReadSuccessfully(
                     CardData(
