@@ -85,7 +85,7 @@ const EMVPaymentScreen: React.FC = () => {
           onPress={() => runRecurringTransaction('2.00')}
           disabled={loading || !isDeviceConnected}
         >
-          <Text style={styles.ctaButtonText}>Recurring Transaction</Text>
+          <Text style={styles.ctaButtonText}>Setup Recurring</Text>
         </TouchableOpacity>
         
         <TouchableOpacity
@@ -103,7 +103,7 @@ const EMVPaymentScreen: React.FC = () => {
           onPress={() => {}}
           disabled={loading || !isDeviceConnected}
         >
-          <Text style={styles.ctaButtonText}>Pre Auth</Text>
+          <Text style={styles.ctaButtonText}>Upgrade Recurring Account</Text>
         </TouchableOpacity>
         
         <TouchableOpacity
@@ -111,7 +111,7 @@ const EMVPaymentScreen: React.FC = () => {
           onPress={() => {}}
           disabled={loading || !isDeviceConnected}
         >
-          <Text style={styles.ctaButtonText}>$0 Auth</Text>
+          <Text style={styles.ctaButtonText}>Replace Recurring Card</Text>
         </TouchableOpacity>
         
         <TouchableOpacity
