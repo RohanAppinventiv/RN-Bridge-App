@@ -1,6 +1,6 @@
 {
     "name": "quivio-transaction-processor",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "description": "React Native hook for Card payment integration with DataCap",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
