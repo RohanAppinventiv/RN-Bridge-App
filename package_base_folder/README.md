@@ -98,13 +98,22 @@ import { View, Text, Button } from 'react-native';
 import { useEMVPayment } from 'quivio-transaction-processor';
 
 const PaymentScreen = () => {
+  // EMV Configuration - Replace with your actual values
+  const emvConfig = {
+    merchantID: "YOUR_MERCHANT_ID",
+    onlineMerchantID: "YOUR_ONLINE_MERCHANT_ID",
+    isSandBox: true, // true for testing, false for production
+    secureDeviceName: "YOUR_DEVICE_NAME", // Terminal device name
+    operatorID: "YOUR_OPERATOR_ID" // Employee ID
+  };
+
   const {
     isDeviceConnected,
     loading,
     handleCardPayment,
     setupConfig,
     logs
-  } = useEMVPayment();
+  } = useEMVPayment(emvConfig);
 
   return (
     <View>
@@ -136,6 +145,15 @@ import { View, Text, Button } from 'react-native';
 import { useEMVPayment } from 'quivio-transaction-processor';
 
 const AdvancedPaymentScreen = () => {
+  // EMV Configuration - Replace with your actual values
+  const emvConfig = {
+    merchantID: "YOUR_MERCHANT_ID",
+    onlineMerchantID: "YOUR_ONLINE_MERCHANT_ID",
+    isSandBox: true, // true for testing, false for production
+    secureDeviceName: "YOUR_DEVICE_NAME", // Terminal device name
+    operatorID: "YOUR_OPERATOR_ID" // Employee ID
+  };
+
   const {
     isDeviceConnected,
     loading,
@@ -147,7 +165,7 @@ const AdvancedPaymentScreen = () => {
     unsubscribeFromEvent,
     EVENTS,
     logs
-  } = useEMVPayment();
+  } = useEMVPayment(emvConfig);
 
   useEffect(() => {
     // Subscribe to payment events
@@ -197,6 +215,24 @@ const AdvancedPaymentScreen = () => {
 
 The main hook that provides all EMV payment functionality.
 
+#### Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `config` | `EMVConfig` | Yes | EMV configuration object |
+
+#### Configuration Object
+
+```typescript
+interface EMVConfig {
+  merchantID: string;
+  onlineMerchantID: string;
+  isSandBox: boolean;
+  secureDeviceName: string;
+  operatorID: string;
+}
+```
+
 #### Returns
 
 | Property | Type | Description |
@@ -229,6 +265,14 @@ The following events are available for subscription:
 ### Types
 
 ```typescript
+interface EMVConfig {
+  merchantID: string;
+  onlineMerchantID: string;
+  isSandBox: boolean;
+  secureDeviceName: string;
+  operatorID: string;
+}
+
 interface CallbackLog {
   type: string;
   payload: any;
