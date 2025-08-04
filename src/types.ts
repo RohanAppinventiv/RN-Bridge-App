@@ -24,6 +24,7 @@ export interface EMVPaymentHook {
     isInitialized: boolean;
     handleCardPayment: (amount: string) => void;
     handleInHousePayment: () => void;
+    runRecurringTransaction: (amount: string) => void;
     setupConfig: () => void;
     pingConfig: () => void;
     clearTransactionListener: () => void;

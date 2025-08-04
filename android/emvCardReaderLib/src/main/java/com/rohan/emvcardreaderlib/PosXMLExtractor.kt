@@ -126,4 +126,13 @@ class PosXMLExtractor {
         val map = extractAllPrepaidCardKeyValues(xml)
         return BIN (value = map["PrePaidTrack2"] ?: "0123456789")
     }
+
+    /**
+     * Checks if the response indicates a process is already running
+     * Returns true if ResponseOrigin is "Client" and DSIXReturnCode is "003002"
+     */
+    fun isProcessAlreadyRunning(xml: String): Boolean {
+        return getTag(xml, "ResponseOrigin") == "Client" &&
+               getTag(xml, "DSIXReturnCode") == "003002"
+    }
 }

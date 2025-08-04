@@ -77,6 +77,13 @@ class DsiEMVManagerModule(private val reactContext: ReactApplicationContext) :
         }
     }
 
+    @ReactMethod
+    fun runRecurringTransaction(amount: String) {
+        Log.d("DsiEMVManagerModule", "runRecurringTransaction called with amount: $amount")
+        CoroutineScope(Dispatchers.Main).launch {
+            dsiEMVManager?.runRecurringTransaction(amount)
+        }
+    }
 
     // ConfigurationCommunicator callbacks
     override fun onConfigError(errorMessage: String) {

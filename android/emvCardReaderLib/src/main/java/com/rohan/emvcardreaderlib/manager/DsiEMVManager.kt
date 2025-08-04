@@ -71,6 +71,12 @@ class DsiEMVManager(
         currentPosState = CrState.EmvSale
     }
 
+    suspend fun runRecurringTransaction(amount: String) = withContext(Dispatchers.IO) {
+        resetPinPad()
+        posTransactionExecutor.doRecurringSale(amount)
+        currentPosState = CrState.EmvSale
+    }
+
     fun registerListener(
         communicator: EMVTransactionCommunicator,
         configurationCommunicator: ConfigurationCommunicator? = null
@@ -89,6 +95,17 @@ class DsiEMVManager(
     private val processListener = ProcessTransactionResponseListener { res ->
         Log.d(PRINT_TAG, "Process Response: $res")
         CoroutineScope(Dispatchers.IO).launch {
+            // Check if process is already running and auto-cancel if needed
+            if (posResponseExtractor.isProcessAlreadyRunning(res)) {
+                Log.d(PRINT_TAG, "Process already running detected. Auto-cancelling transaction...")
+                try {
+                    cancelTransaction()
+                    Log.d(PRINT_TAG, "Auto-cancel transaction called successfully")
+                } catch (e: Exception) {
+                    Log.e(PRINT_TAG, "Auto-cancel failed: ${e.message}")
+                }
+            }
+            
             val response = posResponseExtractor.resolveResponse(res)
             when (response) {
                 is CRTransactionResponse.Error -> {

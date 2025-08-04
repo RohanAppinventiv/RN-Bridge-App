@@ -27,6 +27,7 @@ const EMVPaymentScreen: React.FC = () => {
     isInitialized,
     handleCardPayment,
     handleInHousePayment,
+    runRecurringTransaction,
     setupConfig,
     clearAllTransactions,
     cancelOperation,
@@ -66,7 +67,7 @@ const EMVPaymentScreen: React.FC = () => {
           onPress={() => handleCardPayment('1.50')}
           disabled={loading || !isDeviceConnected}
         >
-          <Text style={styles.ctaButtonText}>Pay via EMV Sale</Text>
+          <Text style={styles.ctaButtonText}>Pay via Credit Card</Text>
         </TouchableOpacity>
         
         <TouchableOpacity
@@ -80,11 +81,45 @@ const EMVPaymentScreen: React.FC = () => {
 
       <View style={styles.buttonRow}>
         <TouchableOpacity
+          style={[styles.ctaButton, (loading || !isDeviceConnected) ? styles.ctaButtonDisabled : styles.ctaButtonEnabled]}
+          onPress={() => runRecurringTransaction('2.00')}
+          disabled={loading || !isDeviceConnected}
+        >
+          <Text style={styles.ctaButtonText}>Recurring Transaction</Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity
           style={[styles.ctaButton, loading ? styles.ctaButtonDisabled : styles.ctaButtonEnabled]}
           onPress={clearAllTransactions}
           disabled={loading}
         >
           <Text style={styles.ctaButtonText}>Clear All</Text>
+        </TouchableOpacity>
+      </View>
+
+      <View style={styles.buttonRow}>
+        <TouchableOpacity
+          style={[styles.ctaButton, (loading || !isDeviceConnected) ? styles.ctaButtonDisabled : styles.ctaButtonEnabled]}
+          onPress={() => {}}
+          disabled={loading || !isDeviceConnected}
+        >
+          <Text style={styles.ctaButtonText}>Pre Auth</Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity
+          style={[styles.ctaButton, (loading || !isDeviceConnected) ? styles.ctaButtonDisabled : styles.ctaButtonEnabled]}
+          onPress={() => {}}
+          disabled={loading || !isDeviceConnected}
+        >
+          <Text style={styles.ctaButtonText}>$0 Auth</Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity
+          style={[styles.ctaButton, (loading || !isDeviceConnected) ? styles.ctaButtonDisabled : styles.ctaButtonEnabled]}
+          onPress={() => {}}
+          disabled={loading || !isDeviceConnected}
+        >
+          <Text style={styles.ctaButtonText}>Refund</Text>
         </TouchableOpacity>
       </View>
 

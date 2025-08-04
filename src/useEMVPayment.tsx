@@ -209,6 +209,19 @@ export const useEMVPayment = (): EMVPaymentHook => {
         }
     }, [appendLog]);
 
+    const runRecurringTransaction = useCallback((amount: string) => {
+        try {
+            setLoading(true);
+            waitingForEvent.current = true;
+            DsiEMVManagerBridge.runRecurringTransaction(amount);
+            appendLog('runRecurringTransaction', `Amount: ${amount}`);
+        } catch (e) {
+            setLoading(false);
+            waitingForEvent.current = false;
+            appendLog('error', `runRecurringTransaction failed: ${(e as Error).message}`);
+        }
+    }, [appendLog]);
+
     const setupConfig = useCallback(() => {
         try {
             if (!isInitialized) {
@@ -282,6 +295,7 @@ export const useEMVPayment = (): EMVPaymentHook => {
         isInitialized,
         handleCardPayment: runSaleTransaction,
         handleInHousePayment: collectCardDetails,
+        runRecurringTransaction,
         setupConfig,
         pingConfig,
         clearTransactionListener,

@@ -25,6 +25,14 @@ class POSTransactionExecutor(context: Context, posConfig: ConfigFactory) {
         }
     }
 
+    suspend fun doRecurringSale(amount: String) {
+        withContext(Dispatchers.IO){
+            val request = requestBuilder.buildEMVRecurringSaleRequest(amount)
+            Log.d(PRINT_TAG, "Recurring Sale request prepared: $request")
+            dsiEMVAndroidLib.ProcessTransaction(request)
+        }
+    }
+
     suspend fun collectCardData(){
         withContext(Dispatchers.IO){
             Log.d(PRINT_TAG, "Inside CollectCardData()")

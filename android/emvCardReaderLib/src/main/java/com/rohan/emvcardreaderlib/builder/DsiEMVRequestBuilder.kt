@@ -7,9 +7,10 @@ class DsiEMVRequestBuilder(val config: ConfigFactory) {
 
     private val merchantID = config.merchantID
     private val onlineMerchantID = config.onlineMerchantID
-    private val operationMode = if(config.isSandBox) "CERT" else "PROD"
+    private val operationMode = if (config.isSandBox) "CERT" else "PROD"
     private var sequenceNo = 10
-//    private val secureDevice = "EMV_VP3350_DATACAP"
+
+    //    private val secureDevice = "EMV_VP3350_DATACAP"
     private val secureDevice = config.secureDeviceName
     private val posPackageID = "dsiEMVAndroid:1.0"
 
@@ -64,19 +65,50 @@ class DsiEMVRequestBuilder(val config: ConfigFactory) {
         <Transaction>
         <SequenceNo>${nextSequenceNo()}</SequenceNo>
         <UserTrace>${getUserTrace()}</UserTrace>
+        <ProcessorToken>TokenRequested</ProcessorToken>
+        <CollectData>CardholderName</CollectData>
+        <PartialAuth>Allow</PartialAuth>
+        <InvoiceNo>0003</InvoiceNo>
+        <RefNo>0003</RefNo>
         <POSPackageID>${posPackageID}</POSPackageID>
         <OperatorID>01</OperatorID>
         <OperationMode>${operationMode}</OperationMode>    
         <MerchantID>${merchantID}</MerchantID>
         <SecureDevice>${secureDevice}</SecureDevice>
-        <InvoiceNo>1</InvoiceNo>
-        <RefNo>1</RefNo>
         <Amount>
             <Purchase>${amount}</Purchase>
             <Gratuity>0.00</Gratuity>
             <CashBack>0.00</CashBack>
         </Amount>
         <TranCode>${TransType.EMVSale.name}</TranCode>
+        </Transaction>
+        </TStream>""".trimIndent()
+    }
+    fun buildEMVRecurringSaleRequest(amount: String): String {
+        return """<?xml version="1.0"?>
+        <TStream>
+        <Transaction>
+            <SequenceNo>${nextSequenceNo()}</SequenceNo>
+            <UserTrace>${getUserTrace()}</UserTrace>
+            <ProcessorToken>TokenRequested</ProcessorToken>
+            <POSPackageID>${posPackageID}</POSPackageID>
+            <OperatorID>01</OperatorID>
+            <PartialAuth>Allow</PartialAuth>
+            <InvoiceNo>0003</InvoiceNo>
+            <RefNo>0003</RefNo>
+            <OperationMode>${operationMode}</OperationMode>
+            <MerchantID>${merchantID}</MerchantID>
+            <SecureDevice>${secureDevice}</SecureDevice>
+            <Amount>
+                <Purchase>${amount}</Purchase>
+            </Amount>
+            <TranCode>${TransType.EMVSale.name}</TranCode>
+            <CollectData>CardholderName</CollectData>
+            <CardType>Credit</CardType>
+            <Frequency>Recurring</Frequency>
+            <RecurringData>Recurring</RecurringData>
+            <RecordNo>RecordNumberRequested</RecordNo>
+            <CardHolderID>Allow_V2</CardHolderID>
         </Transaction>
         </TStream>""".trimIndent()
     }
