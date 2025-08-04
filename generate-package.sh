@@ -8,7 +8,7 @@ set -e  # Exit on any error
 echo "Starting package generation..."
 
 # Define the target directory
-TARGET_DIR="react-native-emv-payment"
+TARGET_DIR="quivio-transaction-processor"
 
 # Bump version in package_base_folder
 echo "Bumping version in package_base_folder..."
@@ -54,13 +54,13 @@ cat > "$TARGET_DIR/libs/emvNative/src/main/AndroidManifest.xml" << 'EOF'
 </manifest>
 EOF
 
-# 6. Clone .npmignore file from react-native-emv-payment-npm-package
+# 6. Clone .npmignore file from package_base_folder
 echo "Cloning .npmignore file..."
-if [ -f "react-native-emv-payment-npm-package/.npmignore" ]; then
-    cp react-native-emv-payment-npm-package/.npmignore "$TARGET_DIR/"
+if [ -f "package_base_folder/.npmignore" ]; then
+    cp package_base_folder/.npmignore "$TARGET_DIR/"
     echo ".npmignore file copied successfully"
 else
-    echo "Warning: .npmignore file not found in react-native-emv-payment-npm-package"
+    echo "Warning: .npmignore file not found in package_base_folder"
 fi
 
 # 7. Remove build directories if they exist
