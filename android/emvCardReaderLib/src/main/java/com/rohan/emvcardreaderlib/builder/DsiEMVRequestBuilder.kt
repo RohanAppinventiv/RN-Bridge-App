@@ -8,30 +8,28 @@ class DsiEMVRequestBuilder(val config: ConfigFactory) {
     private val merchantID = config.merchantID
     private val onlineMerchantID = config.onlineMerchantID
     private val operationMode = if (config.isSandBox) "CERT" else "PROD"
-    private var sequenceNo = 10
-
-    //    private val secureDevice = "EMV_VP3350_DATACAP"
+    private val comPort = 1
     private val secureDevice = config.secureDeviceName
-    private val posPackageID = "dsiEMVAndroid:1.0"
+    private val posPackageID = config.posPackageID
 
-    private fun getUserTrace() = config.operatorID
+    private val userTrace = config.operatorID
 
-    fun nextSequenceNo(): String {
-        sequenceNo++
-        return "001001%04d".format(sequenceNo)
-    }
+    private var sequenceNo = "0010010010"
+
+    private fun createUniqueInvoiceNo() = "${userTrace}-${System.currentTimeMillis()}"
 
     fun buildPinPadResetRequest(): String {
         return """
             <?xml version="1.0"?>
             <TStream>
             <Transaction>
+            <ComPort>${comPort}</ComPort>
             <OperationMode>${operationMode}</OperationMode>    
             <UseForms>Suppressed</UseForms> 
             <MerchantID>${merchantID}</MerchantID>
             <POSPackageID>${posPackageID}</POSPackageID>
             <SecureDevice>${secureDevice}</SecureDevice>
-            <SequenceNo>${nextSequenceNo()}</SequenceNo>
+            <SequenceNo>${sequenceNo}</SequenceNo>
             <TranCode>${TransType.EMVPadReset.name}</TranCode>
             <OperatorID>01</OperatorID>
             </Transaction>
@@ -43,10 +41,10 @@ class DsiEMVRequestBuilder(val config: ConfigFactory) {
         return """<?xml version="1.0" ?>
               <TStream>
                 <Transaction>
-                <ComPort>1</ComPort>
+                <ComPort>${comPort}</ComPort>
                 <SecureDevice>${secureDevice}</SecureDevice>
-                <SequenceNo>${nextSequenceNo()}</SequenceNo>
-                <UserTrace>${getUserTrace()}</UserTrace>
+                <SequenceNo>${sequenceNo}</SequenceNo>
+                <UserTrace>${userTrace}</UserTrace>
                 <MerchantID>${merchantID}</MerchantID>
                 <TranCode>${TransType.GetPrePaidStripe.name}</TranCode>
                 <Account>
@@ -63,24 +61,24 @@ class DsiEMVRequestBuilder(val config: ConfigFactory) {
         return """<?xml version="1.0"?>
         <TStream>
         <Transaction>
-        <SequenceNo>${nextSequenceNo()}</SequenceNo>
-        <UserTrace>${getUserTrace()}</UserTrace>
-        <ProcessorToken>TokenRequested</ProcessorToken>
-        <CollectData>CardholderName</CollectData>
-        <PartialAuth>Allow</PartialAuth>
-        <InvoiceNo>0003</InvoiceNo>
-        <RefNo>0003</RefNo>
+        <ComPort>${comPort}</ComPort>
+        <SequenceNo>${sequenceNo}</SequenceNo>
+        <UserTrace>${userTrace}</UserTrace>
         <POSPackageID>${posPackageID}</POSPackageID>
-        <OperatorID>01</OperatorID>
         <OperationMode>${operationMode}</OperationMode>    
         <MerchantID>${merchantID}</MerchantID>
         <SecureDevice>${secureDevice}</SecureDevice>
+        <TranCode>${TransType.EMVSale.name}</TranCode>
         <Amount>
             <Purchase>${amount}</Purchase>
             <Gratuity>0.00</Gratuity>
             <CashBack>0.00</CashBack>
         </Amount>
-        <TranCode>${TransType.EMVSale.name}</TranCode>
+        <InvoiceNo>${createUniqueInvoiceNo()}</InvoiceNo>
+        <RefNo>${createUniqueInvoiceNo()}</RefNo>
+        <OperatorID>01</OperatorID>
+        <Frequency>Recurring</Frequency>
+        <RecordNo>RecordNumberRequested</RecordNo>
         </Transaction>
         </TStream>""".trimIndent()
     }
@@ -88,22 +86,23 @@ class DsiEMVRequestBuilder(val config: ConfigFactory) {
         return """<?xml version="1.0"?>
         <TStream>
         <Transaction>
+            <ComPort>${comPort}</ComPort>
             <MerchantID>${merchantID}</MerchantID>
             <OperationMode>${operationMode}</OperationMode>
             <POSPackageID>${posPackageID}</POSPackageID>
             <OperatorID>01</OperatorID>
-            <UserTrace>${getUserTrace()}</UserTrace>
+            <UserTrace>${userTrace}</UserTrace>
             <CardType>Credit</CardType>
             <TranCode>${TransType.EMVSale.name}</TranCode>
             <ProcessorToken>TokenRequested</ProcessorToken>
             <CollectData>CardholderName</CollectData>
             <SecureDevice>${secureDevice}</SecureDevice>
-            <InvoiceNo>0003</InvoiceNo>
-            <RefNo>0003</RefNo>
-             <Amount>
+            <InvoiceNo>${createUniqueInvoiceNo()}</InvoiceNo>
+            <RefNo>${createUniqueInvoiceNo()}</RefNo>
+            <Amount>
                 <Purchase>${amount}</Purchase>
             </Amount>
-            <SequenceNo>${nextSequenceNo()}</SequenceNo>
+            <SequenceNo>${sequenceNo}</SequenceNo>
             <Frequency>Recurring</Frequency>
             <RecurringData>Recurring</RecurringData>
             <RecordNo>RecordNumberRequested</RecordNo>
@@ -117,10 +116,11 @@ class DsiEMVRequestBuilder(val config: ConfigFactory) {
         <?xml version="1.0"?>
         <TStream>
         <Admin>
+        <ComPort>${comPort}</ComPort>
         <OperationMode>${operationMode}</OperationMode>    
         <TranCode>${TransType.EMVParamDownload.name}</TranCode>
         <MerchantID>${merchantID}</MerchantID>
-        <SequenceNo>${nextSequenceNo()}</SequenceNo>
+        <SequenceNo>${sequenceNo}</SequenceNo>
         <POSPackageID>${posPackageID}</POSPackageID>
         <SecureDevice>${secureDevice}</SecureDevice>
         <OperatorID>01</OperatorID>

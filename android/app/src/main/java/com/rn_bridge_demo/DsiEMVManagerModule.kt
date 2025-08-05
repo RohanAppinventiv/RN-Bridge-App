@@ -8,6 +8,7 @@ import com.rohan.emvcardreaderlib.EMVTransactionCommunicator
 import com.rohan.emvcardreaderlib.ConfigurationCommunicator
 import com.rohan.emvcardreaderlib.CardData
 import com.rohan.emvcardreaderlib.SaleTransactionResponse
+import com.rohan.emvcardreaderlib.RecurringTransactionResponse
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -145,6 +146,33 @@ class DsiEMVManagerModule(private val reactContext: ReactApplicationContext) :
             putString("payAPIId", saleDetails.payAPIId)
         }
         sendEvent("onSaleTransactionCompleted", map)
+    }
+
+    override fun onRecurringSaleCompleted(recurringDetails: RecurringTransactionResponse) {
+        Log.d("DsiEMVManagerModule", "onRecurringSaleCompleted")
+        val map = Arguments.createMap().apply {
+            putString("merchantID", recurringDetails.merchantID)
+            putString("acctNo", recurringDetails.acctNo)
+            putString("cardType", recurringDetails.cardType)
+            putString("tranCode", recurringDetails.tranCode)
+            putString("authCode", recurringDetails.authCode)
+            putString("captureStatus", recurringDetails.captureStatus)
+            putString("refNo", recurringDetails.refNo)
+            putMap("amount", Arguments.createMap().apply {
+                putString("purchase", recurringDetails.amount.purchase)
+                putString("gratuity", recurringDetails.amount.gratuity)
+                putString("cashBack", recurringDetails.amount.cashBack)
+                putString("authorize", recurringDetails.amount.authorize)
+            })
+            putString("processData", recurringDetails.processData)
+            putString("recordNo", recurringDetails.recordNo)
+            putString("entryMethod", recurringDetails.entryMethod)
+            putString("date", recurringDetails.date)
+            putString("time", recurringDetails.time)
+            putString("applicationLabel", recurringDetails.applicationLabel)
+            putString("payAPIId", recurringDetails.payAPIId)
+        }
+        sendEvent("onRecurringSaleCompleted", map)
     }
 
     override fun onShowMessage(message: String) {

@@ -95,7 +95,7 @@ class DsiEMVManager(
     private val processListener = ProcessTransactionResponseListener { res ->
         Log.d(PRINT_TAG, "Process Response: $res")
         CoroutineScope(Dispatchers.IO).launch {
-            // Check if process is already running and auto-cancel if needed
+            // First check if a process is already running
             if (posResponseExtractor.isProcessAlreadyRunning(res)) {
                 Log.d(PRINT_TAG, "Process already running detected. Auto-cancelling transaction...")
                 try {
@@ -104,22 +104,25 @@ class DsiEMVManager(
                 } catch (e: Exception) {
                     Log.e(PRINT_TAG, "Auto-cancel failed: ${e.message}")
                 }
+                return@launch // Return early after cancel
             }
             
-            val response = posResponseExtractor.resolveResponse(res)
-            when (response) {
-                is CRTransactionResponse.Error -> {
-                    checkErrorResponse(response)
-                }
-
-                is CRTransactionResponse.Success -> {
-                    checkSuccessResponse(response)
-                }
+            // Call isFailed function and store result
+            val resStatus = posResponseExtractor.isFailed(res)
+            
+            // Check if error or success
+            if (resStatus) {
+                // Error case
+                checkErrorResponse(res)
+            } else {
+                // Success case
+                checkSuccessResponse(res)
             }
         }
     }
 
-    private suspend fun checkErrorResponse(error: CRTransactionResponse.Error) {
+    private suspend fun checkErrorResponse(xml: String) {
+        val error = posResponseExtractor.resolveResponse(xml) as CRTransactionResponse.Error
         when (currentPosState) {
             CrState.RunConfig -> {
                 if (error.failureCode == ErrorCode.PSCS_ERROR.code) {
@@ -138,7 +141,7 @@ class DsiEMVManager(
         currentPosState = CrState.IDLE
     }
 
-    private fun checkSuccessResponse(success: CRTransactionResponse.Success) {
+    private fun checkSuccessResponse(xml: String) {
         when (currentPosState) {
             CrState.PingConfig -> {
                 configCommunicator?.onConfigPingSuccess()
@@ -149,11 +152,13 @@ class DsiEMVManager(
             }
 
             CrState.EmvSale -> {
+                val success = posResponseExtractor.resolveResponse(xml) as CRTransactionResponse.Success
                 communicator?.onSaleTransactionCompleted(success.transactionDetails)
             }
 
             CrState.SetupRecurringSale -> {
-                communicator?.onSaleTransactionCompleted(success.transactionDetails)
+                val recurringDetails = posResponseExtractor.mapToRecurringTransactionData(xml)
+                communicator?.onRecurringSaleCompleted(recurringDetails)
             }
             CrState.PrePaidCardDataCollect -> {
                 communicator?.onCardReadSuccessfully(

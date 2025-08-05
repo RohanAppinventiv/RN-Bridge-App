@@ -2,6 +2,7 @@ export const EVENT_NAMES = [
     'onError',
     'onCardReadSuccessfully',
     'onSaleTransactionCompleted',
+    'onRecurringSaleCompleted',
     'onShowMessage',
     'onConfigError',
     'onConfigPingFailed',

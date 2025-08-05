@@ -59,3 +59,21 @@ data class Amount(
     val cashBack: String,
     val authorize: String
 )
+
+data class RecurringTransactionResponse(
+    val merchantID: String,
+    val acctNo: String,
+    val cardType: String,
+    val tranCode: String,
+    val authCode: String,
+    val captureStatus: String,
+    val refNo: String,
+    val amount: Amount,
+    val processData: String,
+    val recordNo: String,
+    val entryMethod: String,
+    val date: String,
+    val time: String,
+    val applicationLabel: String,
+    val payAPIId: String
+)

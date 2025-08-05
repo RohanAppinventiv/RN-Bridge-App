@@ -64,7 +64,7 @@ const EMVPaymentScreen: React.FC = () => {
 
         <TouchableOpacity
           style={[styles.ctaButton, (loading || !isDeviceConnected) ? styles.ctaButtonDisabled : styles.ctaButtonEnabled]}
-          onPress={() => handleCardPayment('1.50')}
+          onPress={() => handleCardPayment('1.00')}
           disabled={loading || !isDeviceConnected}
         >
           <Text style={styles.ctaButtonText}>Pay via Credit Card</Text>
@@ -82,7 +82,7 @@ const EMVPaymentScreen: React.FC = () => {
       <View style={styles.buttonRow}>
         <TouchableOpacity
           style={[styles.ctaButton, (loading || !isDeviceConnected) ? styles.ctaButtonDisabled : styles.ctaButtonEnabled]}
-          onPress={() => runRecurringTransaction('2.00')}
+          onPress={() => runRecurringTransaction('1.50')}
           disabled={loading || !isDeviceConnected}
         >
           <Text style={styles.ctaButtonText}>Setup Recurring</Text>

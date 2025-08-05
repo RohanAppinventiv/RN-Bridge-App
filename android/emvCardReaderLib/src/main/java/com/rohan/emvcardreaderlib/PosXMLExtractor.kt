@@ -127,6 +127,32 @@ class PosXMLExtractor {
         return BIN (value = map["PrePaidTrack2"] ?: "0123456789")
     }
 
+    fun mapToRecurringTransactionData(xml: String): RecurringTransactionResponse {
+        val map = extractTranResponseData(xml)
+        return RecurringTransactionResponse(
+            merchantID = map["MerchantID"] ?: "",
+            acctNo = map["AcctNo"] ?: "",
+            cardType = map["CardType"] ?: "",
+            tranCode = map["TranCode"] ?: "",
+            authCode = map["AuthCode"] ?: "",
+            captureStatus = map["CaptureStatus"] ?: "",
+            refNo = map["RefNo"] ?: "",
+            amount = Amount(
+                purchase = map["Purchase"] ?: "0.00",
+                gratuity = map["Gratuity"] ?: "0.00",
+                cashBack = map["CashBack"] ?: "0.00",
+                authorize = map["Authorize"] ?: "0.00"
+            ),
+            processData = map["ProcessData"] ?: "",
+            recordNo = map["RecordNo"] ?: "",
+            entryMethod = map["EntryMethod"] ?: "",
+            date = map["Date"] ?: "",
+            time = map["Time"] ?: "",
+            applicationLabel = map["ApplicationLabel"] ?: "",
+            payAPIId = map["PayAPI_Id"] ?: ""
+        )
+    }
+
     /**
      * Checks if the response indicates a process is already running
      * Returns true if ResponseOrigin is "Client" and DSIXReturnCode is "003002"
@@ -134,5 +160,13 @@ class PosXMLExtractor {
     fun isProcessAlreadyRunning(xml: String): Boolean {
         return getTag(xml, "ResponseOrigin") == "Client" &&
                getTag(xml, "DSIXReturnCode") == "003002"
+    }
+
+    /**
+     * Checks if the response indicates a failure
+     * Returns true if CmdStatus is "Error"
+     */
+    fun isFailed(xml: String): Boolean {
+        return getTag(xml, "CmdStatus") == "Error"
     }
 }

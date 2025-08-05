@@ -43,7 +43,8 @@ export const useEMVPayment = (): EMVPaymentHook => {
                 onlineMerchantID: "SONNYTAMA35000EP",
                 isSandBox: true, // true for testing, false for production
                 secureDeviceName: "EMV_VP3350_DATACAP", // Terminal device name
-                operatorID: "001" // Employee ID
+                operatorID: "001", // Employee ID
+                posPackageID: "com.quivio.app:1.0.0"
             };
 
             DsiEMVManagerBridge.initialize(config);
@@ -136,6 +137,15 @@ export const useEMVPayment = (): EMVPaymentHook => {
                     appendLog(
                         'saleTransaction',
                         `Sale completed. Capture Status: ${captureStatus}, Amount: ${amount}`
+                    );
+                    setLoading(false);
+                    waitingForEvent.current = false;
+                } else if (event === 'onRecurringSaleCompleted') {
+                    const captureStatus = payload?.captureStatus;
+                    const amount = payload?.amount?.purchase;
+                    appendLog(
+                        'recurringTransaction',
+                        `Recurring sale completed. Capture Status: ${captureStatus}, Amount: ${amount}`
                     );
                     setLoading(false);
                     waitingForEvent.current = false;

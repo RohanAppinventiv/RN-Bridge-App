@@ -9,7 +9,8 @@ class POSConfigFactory {
         override val onlineMerchantID: String,
         override val isSandBox: Boolean, // true then "CERT" else "PROD"
         override val secureDeviceName: String, // Terminal device name
-        override val operatorID: String // employee id
+        override val operatorID: String, // employee id
+        override val posPackageID: String // POS package ID
     ): ConfigFactory
 
     companion object {
@@ -20,7 +21,8 @@ class POSConfigFactory {
                 onlineMerchantID = map.getStringOrThrow("onlineMerchantID"),
                 isSandBox        = map.getBooleanOrDefault("isSandBox", true),
                 secureDeviceName = map.getStringOrThrow("secureDeviceName"),
-                operatorID       = map.getStringOrThrow("operatorID")
+                operatorID       = map.getStringOrThrow("operatorID"),
+                posPackageID     = map.getStringOrThrow("posPackageID")
             )
         }
 
