@@ -49,8 +49,10 @@ class POSTransactionExecutor(context: Context, posConfig: ConfigFactory) {
     suspend fun downloadConfig(){
         withContext(Dispatchers.IO){
             Log.d(PRINT_TAG, "Inside downloadConfig()")
+            val request = requestBuilder.buildEMVParamDownloadRequest()
+            Log.d(PRINT_TAG, "Prepared DownloadParam Request: $request")
             dsiEMVAndroidLib.ProcessTransaction(
-                requestBuilder.buildEMVParamDownloadRequest()
+                request
             )
         }
     }

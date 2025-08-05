@@ -3,8 +3,6 @@ package com.rohan.emvcardreaderlib.manager
 import android.content.Context
 import android.util.Log
 import com.datacap.android.ProcessTransactionResponseListener
-import com.rohan.emvcardreaderlib.BridgeCommunicator
-import com.rohan.emvcardreaderlib.CRTransactionResponse
 import com.rohan.emvcardreaderlib.CardData
 import com.rohan.emvcardreaderlib.ConfigFactory
 import com.rohan.emvcardreaderlib.ConfigurationCommunicator
@@ -13,7 +11,7 @@ import com.rohan.emvcardreaderlib.EMVTransactionCommunicator
 import com.rohan.emvcardreaderlib.ErrorCode
 import com.rohan.emvcardreaderlib.POSTransactionExecutor
 import com.rohan.emvcardreaderlib.PRINT_TAG
-import com.rohan.emvcardreaderlib.PosXMLExtractor
+import com.rohan.emvcardreaderlib.XMLResponseExtractor
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -31,8 +29,8 @@ class DsiEMVManager(
         POSTransactionExecutor(context, posConfig)
     }
 
-    private val posResponseExtractor by lazy {
-        PosXMLExtractor()
+      private val posXMLResponseExtractor by lazy {
+          XMLResponseExtractor()
     }
 
     private suspend fun resetPinPad() {
@@ -96,7 +94,7 @@ class DsiEMVManager(
         Log.d(PRINT_TAG, "Process Response: $res")
         CoroutineScope(Dispatchers.IO).launch {
             // First check if a process is already running
-            if (posResponseExtractor.isProcessAlreadyRunning(res)) {
+            if (posXMLResponseExtractor.isProcessAlreadyRunning(res)) {
                 Log.d(PRINT_TAG, "Process already running detected. Auto-cancelling transaction...")
                 try {
                     cancelTransaction()
@@ -108,7 +106,7 @@ class DsiEMVManager(
             }
             
             // Call isFailed function and store result
-            val resStatus = posResponseExtractor.isFailed(res)
+            val resStatus = posXMLResponseExtractor.isFailed(res)
             
             // Check if error or success
             if (resStatus) {
@@ -122,21 +120,23 @@ class DsiEMVManager(
     }
 
     private suspend fun checkErrorResponse(xml: String) {
-        val error = posResponseExtractor.resolveResponse(xml) as CRTransactionResponse.Error
-        when (currentPosState) {
-            CrState.RunConfig -> {
-                if (error.failureCode == ErrorCode.PSCS_ERROR.code) {
-                    downloadConfigParams()
-                } else {
-                    configCommunicator?.onConfigError(error.msg)
+        val error = posXMLResponseExtractor.resolveError(xml)
+
+        error?.let { errorRes ->
+            when (currentPosState) {
+                CrState.RunConfig -> {
+                    if (errorRes.dsixReturnCode == ErrorCode.PSCS_ERROR.code) {
+                        downloadConfigParams()
+                    } else {
+                        configCommunicator?.onConfigError(errorRes.textResponse)
+                    }
                 }
-            }
+                CrState.PingConfig -> configCommunicator?.onConfigPingFailed()
+                else -> {
+                    communicator?.onError(error.textResponse)
+                }
 
-            CrState.PingConfig -> configCommunicator?.onConfigPingFailed()
-            else -> {
-                communicator?.onError(error.msg)
             }
-
         }
         currentPosState = CrState.IDLE
     }
@@ -152,13 +152,17 @@ class DsiEMVManager(
             }
 
             CrState.EmvSale -> {
-                val success = posResponseExtractor.resolveResponse(xml) as CRTransactionResponse.Success
-                communicator?.onSaleTransactionCompleted(success.transactionDetails)
+                val response = posXMLResponseExtractor.extractSaleResponse(xml)
+                response?.let {
+                    communicator?.onSaleTransactionCompleted(it)
+                }
             }
 
             CrState.SetupRecurringSale -> {
-                val recurringDetails = posResponseExtractor.mapToRecurringTransactionData(xml)
-                communicator?.onRecurringSaleCompleted(recurringDetails)
+                val recurringDetails = posXMLResponseExtractor.extractRecurringTransactionResponse(xml)
+                recurringDetails?.let {
+                    communicator?.onRecurringSaleCompleted(it)
+                }
             }
             CrState.PrePaidCardDataCollect -> {
                 communicator?.onCardReadSuccessfully(

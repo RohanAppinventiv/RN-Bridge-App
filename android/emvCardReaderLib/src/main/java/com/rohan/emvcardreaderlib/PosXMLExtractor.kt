@@ -13,22 +13,22 @@ class PosXMLExtractor {
         return regex.find(xml)?.groupValues?.get(1)
     }
 
-    fun resolveResponse(xml: String): CRTransactionResponse {
-        return if (cmdStatus(xml) == "Error") {
-            CRTransactionResponse.Error(
-                getCode(xml),
-                getMessage(xml),
-                extractPrintDataBlock(xml),
-            )
-        } else {
-            CRTransactionResponse.Success(
-                getCode(xml),
-                getMessage(xml),
-                extractPrintDataBlock(xml),
-                transactionDetails = mapToTranResponseData(xml)
-            )
-        }
-    }
+//    fun resolveResponse(xml: String): CRTransactionResponse {
+//        return if (cmdStatus(xml) == "Error") {
+//            CRTransactionResponse.Error(
+//                getCode(xml),
+//                getMessage(xml),
+//                extractPrintDataBlock(xml),
+//            )
+//        } else {
+//            CRTransactionResponse.Success(
+//                getCode(xml),
+//                getMessage(xml),
+//                extractPrintDataBlock(xml),
+//                transactionDetails = mapToTranResponseData(xml)
+//            )
+//        }
+//    }
 
     fun resolvePrePaidCardData(xml: String): CRPrepaidResponse {
         return if (cmdStatus(xml) == "Success") {
@@ -78,31 +78,53 @@ class PosXMLExtractor {
         return result
     }
 
-    fun mapToTranResponseData(xml: String): SaleTransactionResponse {
-        val map = extractTranResponseData(xml)
-        return SaleTransactionResponse(
-            merchantID = map["MerchantID"] ?: "",
-            acctNo = map["AcctNo"] ?: "",
-            cardType = map["CardType"] ?: "",
-            tranCode = map["TranCode"] ?: "",
-            authCode = map["AuthCode"] ?: "",
-            captureStatus = map["CaptureStatus"] ?: "",
-            refNo = map["RefNo"] ?: "",
-            amount = Amount(
-                purchase = map["Purchase"] ?: "0.00",
-                gratuity = map["Gratuity"] ?: "0.00",
-                cashBack = map["CashBack"] ?: "0.00",
-                authorize = map["Authorize"] ?: "0.00"
-            ),
-            processData = map["ProcessData"] ?: "",
-            recordNo = map["RecordNo"] ?: "",
-            entryMethod = map["EntryMethod"] ?: "",
-            date = map["Date"] ?: "",
-            time = map["Time"] ?: "",
-            applicationLabel = map["ApplicationLabel"] ?: "",
-            payAPIId = map["PayAPI_Id"] ?: ""
-        )
-    }
+//    fun mapToTranResponseData(xml: String): SaleTransactionResponse {
+//        val map = extractTranResponseData(xml)
+//        return SaleTransactionResponse(
+//            // Basic response fields
+//            dsixReturnCode = map["DSIXReturnCode"] ?: "",
+//            cmdStatus = map["CmdStatus"] ?: "",
+//            textResponse = map["TextResponse"] ?: "",
+//            sequenceNo = map["SequenceNo"] ?: "",
+//            userTrace = map["UserTrace"] ?: "",
+//
+//            // Transaction details
+//            merchantID = map["MerchantID"] ?: "",
+//            acctNo = map["AcctNo"] ?: "",
+//            cardType = map["CardType"] ?: "",
+//            tranCode = map["TranCode"] ?: "",
+//            authCode = map["AuthCode"] ?: "",
+//            captureStatus = map["CaptureStatus"] ?: "",
+//            refNo = map["RefNo"] ?: "",
+//            invoiceNo = map["InvoiceNo"] ?: "",
+//
+//            // Amount fields
+//            amount = Amount(
+//                purchase = map["Purchase"] ?: "0.00",
+//                gratuity = map["Gratuity"] ?: "0.00",
+//                authorize = map["Authorize"] ?: "0.00",
+//                cashback = map["Cashback"] ?: "0.00"
+//            ),
+//
+//            // Additional transaction data
+//            acqRefData = map["AcqRefData"] ?: "",
+//            processData = map["ProcessData"] ?: "",
+//            recordNo = map["RecordNo"] ?: "",
+//            entryMethod = map["EntryMethod"] ?: "",
+//            date = map["Date"] ?: "",
+//            time = map["Time"] ?: "",
+//            applicationLabel = map["ApplicationLabel"] ?: "",
+//
+//            // EMV specific fields
+//            aid = map["AID"] ?: "",
+//            tvr = map["TVR"] ?: "",
+//            iad = map["IAD"] ?: "",
+//            tsi = map["TSI"] ?: "",
+//            arc = map["ARC"] ?: "",
+//            cvm = map["CVM"] ?: "",
+//            payAPIId = map["PayAPI_Id"] ?: ""
+//        )
+//    }
 
     fun extractAllPrepaidCardKeyValues(xml: String): Map<String, String> {
         val result = mutableMapOf<String, String>()
@@ -127,31 +149,53 @@ class PosXMLExtractor {
         return BIN (value = map["PrePaidTrack2"] ?: "0123456789")
     }
 
-    fun mapToRecurringTransactionData(xml: String): RecurringTransactionResponse {
-        val map = extractTranResponseData(xml)
-        return RecurringTransactionResponse(
-            merchantID = map["MerchantID"] ?: "",
-            acctNo = map["AcctNo"] ?: "",
-            cardType = map["CardType"] ?: "",
-            tranCode = map["TranCode"] ?: "",
-            authCode = map["AuthCode"] ?: "",
-            captureStatus = map["CaptureStatus"] ?: "",
-            refNo = map["RefNo"] ?: "",
-            amount = Amount(
-                purchase = map["Purchase"] ?: "0.00",
-                gratuity = map["Gratuity"] ?: "0.00",
-                cashBack = map["CashBack"] ?: "0.00",
-                authorize = map["Authorize"] ?: "0.00"
-            ),
-            processData = map["ProcessData"] ?: "",
-            recordNo = map["RecordNo"] ?: "",
-            entryMethod = map["EntryMethod"] ?: "",
-            date = map["Date"] ?: "",
-            time = map["Time"] ?: "",
-            applicationLabel = map["ApplicationLabel"] ?: "",
-            payAPIId = map["PayAPI_Id"] ?: ""
-        )
-    }
+//    fun mapToRecurringTransactionData(xml: String): RecurringTransactionResponse {
+//        val map = extractTranResponseData(xml)
+//        return RecurringTransactionResponse(
+//            // Basic response fields
+//            dsixReturnCode = map["DSIXReturnCode"] ?: "",
+//            cmdStatus = map["CmdStatus"] ?: "",
+//            textResponse = map["TextResponse"] ?: "",
+//            sequenceNo = map["SequenceNo"] ?: "",
+//            userTrace = map["UserTrace"] ?: "",
+//
+//            // Transaction details
+//            merchantID = map["MerchantID"] ?: "",
+//            acctNo = map["AcctNo"] ?: "",
+//            cardType = map["CardType"] ?: "",
+//            tranCode = map["TranCode"] ?: "",
+//            authCode = map["AuthCode"] ?: "",
+//            captureStatus = map["CaptureStatus"] ?: "",
+//            refNo = map["RefNo"] ?: "",
+//            invoiceNo = map["InvoiceNo"] ?: "",
+//
+//            // Amount fields
+//            amount = Amount(
+//                purchase = map["Purchase"] ?: "0.00",
+//                gratuity = map["Gratuity"] ?: "0.00",
+//                cashback = map["Cashback"] ?: "0.00",
+//                authorize = map["Authorize"] ?: "0.00",
+//            ),
+//
+//            // Additional transaction data
+//            acqRefData = map["AcqRefData"] ?: "",
+//            processData = map["ProcessData"] ?: "",
+//            recordNo = map["RecordNo"] ?: "",
+//            entryMethod = map["EntryMethod"] ?: "",
+//            date = map["Date"] ?: "",
+//            time = map["Time"] ?: "",
+//            applicationLabel = map["ApplicationLabel"] ?: "",
+//
+//            // EMV specific fields
+//            aid = map["AID"] ?: "",
+//            tvr = map["TVR"] ?: "",
+//            iad = map["IAD"] ?: "",
+//            tsi = map["TSI"] ?: "",
+//            arc = map["ARC"] ?: "",
+//            cvm = map["CVM"] ?: "",
+//            payAPIId = map["PayAPI_Id"] ?: ""
+//        )
+//    }
 
     /**
      * Checks if the response indicates a process is already running

@@ -31,7 +31,6 @@ class DsiEMVRequestBuilder(val config: ConfigFactory) {
             <SecureDevice>${secureDevice}</SecureDevice>
             <SequenceNo>${sequenceNo}</SequenceNo>
             <TranCode>${TransType.EMVPadReset.name}</TranCode>
-            <OperatorID>01</OperatorID>
             </Transaction>
             </TStream>
     """.trimIndent()
@@ -71,12 +70,9 @@ class DsiEMVRequestBuilder(val config: ConfigFactory) {
         <TranCode>${TransType.EMVSale.name}</TranCode>
         <Amount>
             <Purchase>${amount}</Purchase>
-            <Gratuity>0.00</Gratuity>
-            <CashBack>0.00</CashBack>
         </Amount>
         <InvoiceNo>${createUniqueInvoiceNo()}</InvoiceNo>
         <RefNo>${createUniqueInvoiceNo()}</RefNo>
-        <OperatorID>01</OperatorID>
         <Frequency>Recurring</Frequency>
         <RecordNo>RecordNumberRequested</RecordNo>
         </Transaction>
@@ -90,7 +86,6 @@ class DsiEMVRequestBuilder(val config: ConfigFactory) {
             <MerchantID>${merchantID}</MerchantID>
             <OperationMode>${operationMode}</OperationMode>
             <POSPackageID>${posPackageID}</POSPackageID>
-            <OperatorID>01</OperatorID>
             <UserTrace>${userTrace}</UserTrace>
             <CardType>Credit</CardType>
             <TranCode>${TransType.EMVSale.name}</TranCode>
@@ -123,7 +118,6 @@ class DsiEMVRequestBuilder(val config: ConfigFactory) {
         <SequenceNo>${sequenceNo}</SequenceNo>
         <POSPackageID>${posPackageID}</POSPackageID>
         <SecureDevice>${secureDevice}</SecureDevice>
-        <OperatorID>01</OperatorID>
         </Admin>
         </TStream>
     """.trimIndent()

@@ -28,8 +28,10 @@ export const useEMVPayment = (): EMVPaymentHook => {
 
     // Initialize the EMV manager with configuration data (called only once)
     const initializeEMV = useCallback(() => {
-        if (isInitialized) {
+        if (isInitialized) { 
             appendLog('initialize', 'EMV already initialized');
+            setIsInitialized(true);
+            setLoading(false)
             return;
         }
 
@@ -48,7 +50,7 @@ export const useEMVPayment = (): EMVPaymentHook => {
             };
 
             DsiEMVManagerBridge.initialize(config);
-            appendLog('initialize', `EMV initialized with config: ${JSON.stringify(config)}`);
+            appendLog('Initialization', `EMV initialized with config: ${JSON.stringify(config)}`);
             setIsInitialized(true);
             
         } catch (e) {
@@ -101,17 +103,16 @@ export const useEMVPayment = (): EMVPaymentHook => {
         EVENT_NAMES.forEach((event) => {
             const listener = emitter.addListener(event, (payload: any) => {
                 console.log(`React Native received event: ${event}`, payload);
-                appendLog(event, payload);
                 
                 // Handle ping config responses
                 if (event === 'onConfigPingSuccess') {
                     console.log('Setting device connected to TRUE');
-                    appendLog('pingConfigResponse', 'Ping config succeeded');
+                    appendLog('onConfigPingSuccess', 'Configuration ping successful');
                     setIsDeviceConnected(true);
                     setLoading(false);
                     waitingForEvent.current = false;
                 } else if (event === 'onConfigPingFailed') {
-                    appendLog('pingConfigResponse', 'Ping config failed');
+                    appendLog('onConfigPingFailed', 'Configuration ping failed');
                     setIsDeviceConnected(false);
                     setLoading(false);
                     waitingForEvent.current = false;
@@ -119,7 +120,7 @@ export const useEMVPayment = (): EMVPaymentHook => {
                 
                 // Handle setup config responses
                 else if (event === 'onConfigCompleted') {
-                    appendLog('setupConfigResponse', 'Setup config completed');
+                    appendLog('setupConfigResponse', 'Setup Configured Successfully');
                     setIsDeviceConnected(true);
                     setLoading(false);
                     waitingForEvent.current = false;
@@ -132,30 +133,66 @@ export const useEMVPayment = (): EMVPaymentHook => {
                 
                 // Handle other events
                 else if (event === 'onSaleTransactionCompleted') {
-                    const captureStatus = payload?.captureStatus;
-                    const amount = payload?.amount?.purchase;
+                    const {
+                        cmdStatus,
+                        textResponse,
+                        sequenceNo,
+                        userTrace,
+                        acctNo,
+                        cardType,
+                        authCode,
+                        captureStatus,
+                        refNo,
+                        invoiceNo,
+                        amount,
+                        acqRefData,
+                        entryMethod,
+                        date,
+                        time
+                    } = payload || {};
+                    
                     appendLog(
-                        'saleTransaction',
-                        `Sale completed. Capture Status: ${captureStatus}, Amount: ${amount}`
+                        'Single time sale transaction completed',
+                        `TransactionStatus: ${cmdStatus}\nText: ${textResponse}\nSequenceNo: ${sequenceNo}\nUserTrace: ${userTrace}\nAcctNo: ${acctNo}\ncardType: ${cardType}\nauthCode: ${authCode}\nCaptureStatus: ${captureStatus}\nRefNo: ${refNo}\nInvoiceNo: ${invoiceNo}\nAmount: ${amount?.purchase}\nAcqRefData: ${acqRefData}\nEntryMethod: ${entryMethod}\nDate: ${date}\nTime: ${time}`
                     );
                     setLoading(false);
                     waitingForEvent.current = false;
                 } else if (event === 'onRecurringSaleCompleted') {
-                    const captureStatus = payload?.captureStatus;
-                    const amount = payload?.amount?.purchase;
+                    const {
+                        cmdStatus,
+                        textResponse,
+                        sequenceNo,
+                        userTrace,
+                        captureStatus,
+                        refNo,
+                        invoiceNo,
+                        amount,
+                        cardholderName,
+                        acctNo,
+                        cardType,
+                        authCode,
+                        entryMethod,
+                        recordNo,
+                        recurringData,
+                        acqRefData,
+                        date,
+                        time,
+                        payAPIId
+                    } = payload || {};
+                    
                     appendLog(
-                        'recurringTransaction',
-                        `Recurring sale completed. Capture Status: ${captureStatus}, Amount: ${amount}`
+                        'Sale transaction with recurring data completed',
+                        `TransactionStatus: ${cmdStatus}\nText: ${textResponse}\nSequenceNo: ${sequenceNo}\nUserTrace: ${userTrace}\nCaptureStatus: ${captureStatus}\nRefNo: ${refNo}\nInvoiceNo: ${invoiceNo}\nAmount: ${amount?.purchase}\n\nCardHolderName: ${cardholderName}\nAcctNo: ${acctNo}\ncardType: ${cardType}\nauthCode: ${authCode}\nEntryMethod: ${entryMethod}\n\nRecordNo: ${recordNo}\nRecurringData: ${recurringData}\n\nAcqRefData: ${acqRefData}\nDate: ${date}\nTime: ${time}\nPayAPIID: ${payAPIId}`
                     );
                     setLoading(false);
                     waitingForEvent.current = false;
                 } else if (event === 'onCardReadSuccessfully') {
                     const binNumber = payload?.binNumber;
-                    appendLog('cardRead', 'Card read successfully And BIN: ' + binNumber);
+                    appendLog('Card successfully read', 'Card read successfully And BIN: ' + binNumber);
                     setLoading(false);
                     waitingForEvent.current = false;
                 } else if (event === 'onError') {
-                    appendLog('error', `Native error: ${payload}`);
+                    appendLog('Error:', payload);
                     setLoading(false);
                     waitingForEvent.current = false;
                 } else {
@@ -198,7 +235,7 @@ export const useEMVPayment = (): EMVPaymentHook => {
             setLoading(true);
             waitingForEvent.current = true;
             DsiEMVManagerBridge.runSaleTransaction(amount);
-            appendLog('runSaleTransaction', `Amount: ${amount}`);
+            appendLog('Running Single time sale transaction', `Amount: ${amount}`);
         } catch (e) {
             setLoading(false);
             waitingForEvent.current = false;
@@ -211,7 +248,7 @@ export const useEMVPayment = (): EMVPaymentHook => {
             setLoading(true);
             waitingForEvent.current = true;
             DsiEMVManagerBridge.collectCardDetails();
-            appendLog('collectCardDetails', 'Requested card details');
+            appendLog('Running Card Details Collection', 'Requested card details');
         } catch (e) {
             setLoading(false);
             waitingForEvent.current = false;
@@ -224,7 +261,7 @@ export const useEMVPayment = (): EMVPaymentHook => {
             setLoading(true);
             waitingForEvent.current = true;
             DsiEMVManagerBridge.runRecurringTransaction(amount);
-            appendLog('runRecurringTransaction', `Amount: ${amount}`);
+            appendLog('Running a sale transaction with recurring data', `Amount: ${amount}`);
         } catch (e) {
             setLoading(false);
             waitingForEvent.current = false;
@@ -243,7 +280,7 @@ export const useEMVPayment = (): EMVPaymentHook => {
             setLoading(true);
             waitingForEvent.current = true;
             DsiEMVManagerBridge.setupConfig();
-            appendLog('setupConfig', 'Called setupConfig()');
+            appendLog('setupConfig', 'Setting up configurations....');
         } catch (e) {
             setLoading(false);
             waitingForEvent.current = false;
@@ -256,13 +293,13 @@ export const useEMVPayment = (): EMVPaymentHook => {
             setLoading(true);
             waitingForEvent.current = true;
             DsiEMVManagerBridge.pingConfig();
-            appendLog('pingConfig', 'Ping config initiated');
+            appendLog('Ping Device', 'Checking Device Status');
         } catch (e) {
             setLoading(false);
             waitingForEvent.current = false;
-            appendLog('error', `pingConfig failed: ${(e as Error).message}`);
+            appendLog('error', `Pinging Device failed: ${(e as Error).message}`);
         }
-    }, [appendLog]);
+    }, [appendLog]); 
 
     const clearTransactionListener = useCallback(() => {
         try {
@@ -278,9 +315,9 @@ export const useEMVPayment = (): EMVPaymentHook => {
         try {
             // Clear logs only
             setLogs([]);
-            appendLog('clearAllTransactions', 'All logs cleared');
+            appendLog('Clearing All Logs', 'All logs cleared');
         } catch (e) {
-            appendLog('error', `clearAllTransactions failed: ${(e as Error).message}`);
+            appendLog('error', `Clearing All Transactions failed: ${(e as Error).message}`);
         }
     }, [appendLog]);
 
@@ -290,7 +327,6 @@ export const useEMVPayment = (): EMVPaymentHook => {
             DsiEMVManagerBridge.cancelTransaction();
             setLoading(false);
             waitingForEvent.current = false;
-            appendLog('cancelOperation', 'Operation cancelled by user');
         } catch (e) {
             setLoading(false);
             waitingForEvent.current = false;

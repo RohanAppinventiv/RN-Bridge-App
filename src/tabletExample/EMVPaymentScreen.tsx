@@ -64,7 +64,7 @@ const EMVPaymentScreen: React.FC = () => {
 
         <TouchableOpacity
           style={[styles.ctaButton, (loading || !isDeviceConnected) ? styles.ctaButtonDisabled : styles.ctaButtonEnabled]}
-          onPress={() => handleCardPayment('1.00')}
+          onPress={() => handleCardPayment('10.00')}
           disabled={loading || !isDeviceConnected}
         >
           <Text style={styles.ctaButtonText}>Pay via Credit Card</Text>
