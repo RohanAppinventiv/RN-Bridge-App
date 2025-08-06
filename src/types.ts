@@ -43,4 +43,5 @@ export interface EMVConfig {
     isSandBox: boolean;
     secureDeviceName: string;
     operatorID: string;
+    posPackageID: string;
 }

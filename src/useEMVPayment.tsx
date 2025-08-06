@@ -36,7 +36,9 @@ export const useEMVPayment = (config: EMVConfig): EMVPaymentHook => {
         try {
             setLoading(true);
             waitingForEvent.current = true;
-
+            console.log('Initializing EMV with config:', config);
+            console.log('Config keys:', Object.keys(config));
+            console.log('posPackageID value:', config.posPackageID);
             DsiEMVManagerBridge.initialize(config);
             appendLog('Initialization', `EMV initialized with config: ${JSON.stringify(config)}`);
             setIsInitialized(true);

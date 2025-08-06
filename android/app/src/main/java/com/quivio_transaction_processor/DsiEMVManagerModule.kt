@@ -27,6 +27,11 @@ class DsiEMVManagerModule(private val reactContext: ReactApplicationContext) :
     @ReactMethod
     fun initialize(map: ReadableMap) {
         Log.d("DsiEMVManagerModule", "initialize called with config: $map")
+        Log.d("DsiEMVManagerModule", "Config keys: ${map.toHashMap().keys}")
+        Log.d("DsiEMVManagerModule", "posPackageID present: ${map.hasKey("posPackageID")}")
+        if (map.hasKey("posPackageID")) {
+            Log.d("DsiEMVManagerModule", "posPackageID value: ${map.getString("posPackageID")}")
+        }
         val config = POSConfigFactory.processMap(map)
         val context = currentActivity ?: reactContext
         dsiEMVManager = DsiEMVManager(context, config)

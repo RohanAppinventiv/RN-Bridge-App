@@ -2,6 +2,7 @@ package com.quivio_transaction_processor
 
 import com.facebook.react.bridge.ReadableMap
 import com.rohan.emvcardreaderlib.ConfigFactory
+import android.util.Log
 
 class POSConfigFactory {
     private class ConfigDTO(
@@ -14,8 +15,14 @@ class POSConfigFactory {
     ): ConfigFactory
 
     companion object {
-        /** Public entry point: build from RN’s ReadableMap */
+        /** Public entry point: build from RN's ReadableMap */
         fun processMap(map: ReadableMap): ConfigFactory {
+            Log.d("POSConfigFactory", "Processing map with keys: ${map.toHashMap().keys}")
+            Log.d("POSConfigFactory", "posPackageID present: ${map.hasKey("posPackageID")}")
+            if (map.hasKey("posPackageID")) {
+                Log.d("POSConfigFactory", "posPackageID value: ${map.getString("posPackageID")}")
+            }
+            
             return ConfigDTO(
                 merchantID       = map.getStringOrThrow("merchantID"),
                 onlineMerchantID = map.getStringOrThrow("onlineMerchantID"),
