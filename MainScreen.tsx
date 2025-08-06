@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { View, Text, Button, StyleSheet } from 'react-native';
 import EMVPaymentScreen from './src/example/EMVPaymentScreen';
+import { emvConfig } from './src/utils/config';
 
 const MainScreen: React.FC = () => {
   const [showEMV, setShowEMV] = useState(false);
 
   if (showEMV) {
-    return <EMVPaymentScreen />;
+    return <EMVPaymentScreen config={emvConfig} />;
   }
 
   return (

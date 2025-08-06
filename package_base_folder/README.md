@@ -1,17 +1,20 @@
-# quivio-transaction-processor
+# Quivio Transaction Processor
 
-A React Native hook for EMV payment integration with DataCap. This package provides a simple and efficient way to integrate EMV card reader functionality into your React Native Android applications.
+A comprehensive React Native library for EMV payment integration with DataCap terminals. This package provides a robust, TypeScript-first approach to integrating EMV card reader functionality into React Native Android applications.
 
-## Features
+## 🚀 Features
 
-- 🔌 **Easy Integration**: Simple hook-based API for React Native
-- 💳 **EMV Card Support**: Full EMV card reading and processing
-- 🤖 **Android Only**: Native Android implementation with EMV libraries
-- 🔄 **Real-time Events**: Subscribe to payment events and status updates
-- 📊 **Transaction Logging**: Built-in logging for debugging and monitoring
-- ⚡ **TypeScript Support**: Full TypeScript definitions included
+- **🔌 Easy Integration**: Simple hook-based API for React Native
+- **💳 Full EMV Support**: Complete EMV card reading and processing capabilities
+- **🤖 Android Native**: Optimized native Android implementation with EMV libraries
+- **🔄 Real-time Events**: Comprehensive event system for payment status updates
+- **📊 Built-in Logging**: Detailed transaction logging for debugging and monitoring
+- **⚡ TypeScript Support**: Full TypeScript definitions and type safety
+- **🔄 Recurring Payments**: Support for recurring payment transactions
+- **🎯 Multiple Payment Types**: Support for sale, in-house, and recurring transactions
+- **🛡️ Error Handling**: Robust error handling and recovery mechanisms
 
-## Installation
+## 📦 Installation
 
 ```bash
 npm install quivio-transaction-processor
@@ -19,17 +22,17 @@ npm install quivio-transaction-processor
 yarn add quivio-transaction-processor
 ```
 
-### Android Setup
+## 🔧 Android Setup
 
-The package includes native Android libraries that need to be properly configured. Follow these steps:
+This package includes native Android libraries that require proper configuration. Follow these steps carefully:
 
-#### 1. Add dsiEMVAndroid.aar file
+### 1. Add Native Libraries
 
-First, add the `dsiEMVAndroid.aar` file to your `android/app/libs/` folder. This is a critical step as it contains the core EMV functionality.
+First, ensure the `dsiEMVAndroid.aar` file is present in your `android/app/libs/` folder. This file contains the core EMV functionality.
 
-**Note**: Make sure the `libs` folder exists in your `android/app/` directory. If it doesn't exist, create it first.
+**Important**: Create the `libs` folder if it doesn't exist in your `android/app/` directory.
 
-#### 2. Update settings.gradle
+### 2. Update settings.gradle
 
 Add the following lines to your `android/settings.gradle`:
 
@@ -42,7 +45,7 @@ include ':emvNative'
 project(':emvNative').projectDir = file('../node_modules/quivio-transaction-processor/libs/emvNative')
 ```
 
-#### 3. Update app/build.gradle
+### 3. Update app/build.gradle
 
 Add the following dependencies to your `android/app/build.gradle`:
 
@@ -56,9 +59,9 @@ dependencies {
 }
 ```
 
-**Important**: The `implementation files("libs/dsiEMVAndroid.aar")` line is crucial and must be included for the EMV functionality to work.
+**Critical**: The `implementation files("libs/dsiEMVAndroid.aar")` line is essential for EMV functionality.
 
-#### 4. Update MainApplication.kt
+### 4. Update MainApplication.kt
 
 Add the import and package registration to your `android/app/src/main/java/com/your-app/MainApplication.kt`:
 
@@ -78,19 +81,10 @@ class MainApplication : Application(), ReactApplication {
 }
 ```
 
-#### 5. Permissions
 
-Make sure you have the necessary permissions in your `android/app/src/main/AndroidManifest.xml`:
+## 🎯 Quick Start
 
-```xml
-<uses-permission android:name="android.permission.BLUETOOTH" />
-<uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
-<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-```
-
-## Usage
-
-### Basic Example
+### Basic Implementation
 
 ```tsx
 import React from 'react';
@@ -98,17 +92,18 @@ import { View, Text, Button } from 'react-native';
 import { useEMVPayment } from 'quivio-transaction-processor';
 
 const PaymentScreen = () => {
-  // EMV Configuration - Replace with your actual values
   const emvConfig = {
     merchantID: "YOUR_MERCHANT_ID",
     onlineMerchantID: "YOUR_ONLINE_MERCHANT_ID",
     isSandBox: true, // true for testing, false for production
-    secureDeviceName: "YOUR_DEVICE_NAME", // Terminal device name
-    operatorID: "YOUR_OPERATOR_ID" // Employee ID
+    secureDeviceName: "YOUR_DEVICE_NAME",
+    operatorID: "YOUR_OPERATOR_ID",
+    posPackageID: "YOUR_POS_PACKAGE_ID" // App Bundle ID
   };
 
   const {
     isDeviceConnected,
+    isInitialized,
     loading,
     handleCardPayment,
     setupConfig,
@@ -117,7 +112,8 @@ const PaymentScreen = () => {
 
   return (
     <View>
-      <Text>Device Status: {isDeviceConnected ? 'Connected' : 'Not Connected'}</Text>
+      <Text>Status: {isInitialized ? 'Initialized' : 'Not Initialized'}</Text>
+      <Text>Device: {isDeviceConnected ? 'Connected' : 'Not Connected'}</Text>
       
       <Button 
         title="Setup Configuration" 
@@ -126,8 +122,8 @@ const PaymentScreen = () => {
       />
       
       <Button 
-        title="Process Payment ($10.00)" 
-        onPress={() => handleCardPayment('10.00')}
+        title="Process Payment ($5.00)" 
+        onPress={() => handleCardPayment('5.00')}
         disabled={loading || !isDeviceConnected}
       />
       
@@ -137,7 +133,7 @@ const PaymentScreen = () => {
 };
 ```
 
-### Advanced Example with Event Handling
+### Advanced Implementation with Event Handling
 
 ```tsx
 import React, { useEffect } from 'react';
@@ -145,22 +141,26 @@ import { View, Text, Button } from 'react-native';
 import { useEMVPayment } from 'quivio-transaction-processor';
 
 const AdvancedPaymentScreen = () => {
-  // EMV Configuration - Replace with your actual values
   const emvConfig = {
     merchantID: "YOUR_MERCHANT_ID",
     onlineMerchantID: "YOUR_ONLINE_MERCHANT_ID",
-    isSandBox: true, // true for testing, false for production
-    secureDeviceName: "YOUR_DEVICE_NAME", // Terminal device name
-    operatorID: "YOUR_OPERATOR_ID" // Employee ID
+    isSandBox: true,
+    secureDeviceName: "YOUR_DEVICE_NAME",
+    operatorID: "YOUR_OPERATOR_ID",
+    posPackageID: "YOUR_POS_PACKAGE_ID"
   };
 
   const {
     isDeviceConnected,
+    isInitialized,
     loading,
     handleCardPayment,
     handleInHousePayment,
+    runRecurringTransaction,
     setupConfig,
     pingConfig,
+    clearAllTransactions,
+    cancelOperation,
     subscribeToEvent,
     unsubscribeFromEvent,
     EVENTS,
@@ -171,14 +171,17 @@ const AdvancedPaymentScreen = () => {
     // Subscribe to payment events
     const handleSaleCompleted = (payload) => {
       console.log('Sale completed:', payload);
+      // Handle successful sale transaction
     };
 
     const handleCardRead = (payload) => {
       console.log('Card read successfully:', payload);
+      // Handle card read event
     };
 
     const handleError = (payload) => {
       console.error('Payment error:', payload);
+      // Handle error events
     };
 
     // Subscribe to events
@@ -196,12 +199,15 @@ const AdvancedPaymentScreen = () => {
 
   return (
     <View>
-      <Text>Device Status: {isDeviceConnected ? 'Connected' : 'Not Connected'}</Text>
+      <Text>Status: {isInitialized ? 'Initialized' : 'Not Initialized'}</Text>
+      <Text>Device: {isDeviceConnected ? 'Connected' : 'Not Connected'}</Text>
       
       <Button title="Setup Config" onPress={setupConfig} />
       <Button title="Ping Config" onPress={pingConfig} />
-      <Button title="EMV Sale" onPress={() => handleCardPayment('25.00')} />
+      <Button title="EMV Sale" onPress={() => handleCardPayment('5.00')} />
       <Button title="In-House Payment" onPress={handleInHousePayment} />
+      <Button title="Recurring Payment" onPress={() => runRecurringTransaction('5.00')} />
+      <Button title="Clear Logs" onPress={clearAllTransactions} />
       
       {loading && <Text>Processing...</Text>}
     </View>
@@ -209,7 +215,7 @@ const AdvancedPaymentScreen = () => {
 };
 ```
 
-## API Reference
+## 📚 API Reference
 
 ### useEMVPayment Hook
 
@@ -225,11 +231,12 @@ The main hook that provides all EMV payment functionality.
 
 ```typescript
 interface EMVConfig {
-  merchantID: string;
-  onlineMerchantID: string;
-  isSandBox: boolean;
-  secureDeviceName: string;
-  operatorID: string;
+  merchantID: string;           // Your merchant ID
+  onlineMerchantID: string;     // Your online merchant ID
+  isSandBox: boolean;           // true for testing, false for production
+  secureDeviceName: string;     // Terminal device name
+  operatorID: string;           // Employee/operator ID
+  posPackageID: string;         // App Bundle ID
 }
 ```
 
@@ -237,97 +244,182 @@ interface EMVConfig {
 
 | Property | Type | Description |
 |----------|------|-------------|
-| `logs` | `CallbackLog[]` | Array of transaction logs |
+| `logs` | `CallbackLog[]` | Array of transaction logs for debugging |
 | `isDeviceConnected` | `boolean` | Device connection status |
+| `isInitialized` | `boolean` | EMV initialization status |
 | `loading` | `boolean` | Loading state for operations |
 | `handleCardPayment` | `(amount: string) => void` | Process EMV card payment |
 | `handleInHousePayment` | `() => void` | Process in-house payment |
+| `runRecurringTransaction` | `(amount: string) => void` | Process recurring payment |
 | `setupConfig` | `() => void` | Setup device configuration |
 | `pingConfig` | `() => void` | Ping device configuration |
-| `clearTransactionListener` | `() => void` | Clear transaction listeners |
+| `clearAllTransactions` | `() => void` | Clear all transaction logs |
+| `cancelOperation` | `() => void` | Cancel current operation |
+| `initializeEMV` | `() => void` | Manually initialize EMV |
 | `subscribeToEvent` | `(eventName, callback) => void` | Subscribe to events |
 | `unsubscribeFromEvent` | `(eventName, callback) => void` | Unsubscribe from events |
 | `EVENTS` | `Record<EMVEventName, EMVEventName>` | Available event names |
 
-### Event Types
+### Available Events
 
 The following events are available for subscription:
 
-- `onError` - Payment or device errors
-- `onCardReadSuccessfully` - Card successfully read
-- `onSaleTransactionCompleted` - Sale transaction completed
-- `onShowMessage` - Display messages from device
-- `onConfigError` - Configuration errors
-- `onConfigPingFailed` - Configuration ping failed
-- `onConfigPingSuccess` - Configuration ping successful
-- `onConfigCompleted` - Configuration setup completed
+| Event | Description | Payload |
+|-------|-------------|---------|
+| `onError` | Payment or device errors | Error message |
+| `onCardReadSuccessfully` | Card successfully read | Card data with BIN |
+| `onSaleTransactionCompleted` | Sale transaction completed | Transaction details |
+| `onRecurringSaleCompleted` | Recurring sale completed | Recurring transaction details |
+| `onShowMessage` | Display messages from device | Message content |
+| `onConfigError` | Configuration errors | Error details |
+| `onConfigPingFailed` | Configuration ping failed | Failure details |
+| `onConfigPingSuccess` | Configuration ping successful | Success details |
+| `onConfigCompleted` | Configuration setup completed | Configuration details |
 
-### Types
+### Transaction Response Types
 
+#### Sale Transaction Response
 ```typescript
-interface EMVConfig {
-  merchantID: string;
-  onlineMerchantID: string;
-  isSandBox: boolean;
-  secureDeviceName: string;
-  operatorID: string;
+interface SaleTransactionResponse {
+  cmdStatus: string;
+  textResponse: string;
+  sequenceNo: string;
+  userTrace: string;
+  acctNo: string;
+  cardType: string;
+  authCode: string;
+  captureStatus: string;
+  refNo: string;
+  invoiceNo: string;
+  amount: { purchase: string };
+  acqRefData: string;
+  entryMethod: string;
+  date: string;
+  time: string;
 }
-
-interface CallbackLog {
-  type: string;
-  payload: any;
-  timestamp: number;
-}
-
-type EMVEventName = 
-  | 'onError'
-  | 'onCardReadSuccessfully'
-  | 'onSaleTransactionCompleted'
-  | 'onShowMessage'
-  | 'onConfigError'
-  | 'onConfigPingFailed'
-  | 'onConfigPingSuccess'
-  | 'onConfigCompleted';
 ```
 
-## Device Requirements
+#### Recurring Transaction Response
+```typescript
+interface RecurringTransactionResponse {
+  cmdStatus: string;
+  textResponse: string;
+  sequenceNo: string;
+  userTrace: string;
+  captureStatus: string;
+  refNo: string;
+  invoiceNo: string;
+  amount: { purchase: string };
+  cardholderName: string;
+  acctNo: string;
+  cardType: string;
+  authCode: string;
+  entryMethod: string;
+  recordNo: string;
+  recurringData: string;
+  acqRefData: string;
+  date: string;
+  time: string;
+  payAPIId: string;
+}
+```
 
-- Android device with compatible EMV card reader
-- Bluetooth connectivity (for wireless devices)
-- Android 5.0 (API level 21) or higher
-- Proper device drivers and SDK installed
+## 🛠️ Troubleshooting
 
-## Troubleshooting
+### Common Issues and Solutions
 
-### Common Issues
+#### 1. Device Not Connecting
+**Symptoms**: `isDeviceConnected` remains false
+**Solutions**:
+- Ensure device is powered on and in pairing mode
+- Check Bluetooth permissions in app settings
+- Verify device compatibility with your terminal
+- Try restarting the device and re-pairing
 
-1. **Device not connecting**
-   - Ensure the device is powered on and in pairing mode
-   - Check Bluetooth permissions
-   - Verify device compatibility
+#### 2. Payment Processing Fails
+**Symptoms**: Transactions fail or timeout
+**Solutions**:
+- Verify device connection status before processing
+- Ensure card is properly inserted/swiped
+- Check amount format (use "10.00" not "10")
+- Verify merchant configuration is correct
 
-2. **Payment processing fails**
-   - Check device connection status
-   - Verify card is properly inserted/swiped
-   - Ensure proper amount format (e.g., "10.00")
+#### 3. Events Not Firing
+**Symptoms**: No event callbacks received
+**Solutions**:
+- Ensure proper event subscription
+- Check that device is properly configured
+- Verify event names match exactly
+- Check for JavaScript errors in console
 
-3. **Events not firing**
-   - Make sure you're subscribed to the correct events
-   - Check that the device is properly configured
+#### 4. Initialization Issues
+**Symptoms**: `isInitialized` remains false
+**Solutions**:
+- Verify all configuration parameters are provided
+- Check that `posPackageID` matches your app's bundle ID
+- Ensure native modules are properly linked
+- Check Android build for compilation errors
 
 ### Debug Mode
 
-The hook provides detailed logging through the `logs` array. You can display these logs to debug issues:
+The hook provides detailed logging through the `logs` array. Display these logs to debug issues:
 
 ```tsx
 {logs.map((log, index) => (
-  <Text key={index}>
-    {log.type}: {JSON.stringify(log.payload)}
-  </Text>
+  <View key={index} style={styles.logItem}>
+    <Text style={styles.logType}>{log.type}</Text>
+    <Text style={styles.logPayload}>
+      {typeof log.payload === 'object' 
+        ? JSON.stringify(log.payload, null, 2) 
+        : String(log.payload)}
+    </Text>
+    <Text style={styles.logTime}>
+      {new Date(log.timestamp).toLocaleTimeString()}
+    </Text>
+  </View>
 ))}
 ```
 
-## Contributing
+### Error Handling Best Practices
+
+1. **Always check device status** before processing payments
+2. **Subscribe to error events** to handle failures gracefully
+3. **Implement timeout handling** for long-running operations
+4. **Provide user feedback** during loading states
+5. **Log all transactions** for debugging and audit trails
+
+## 📱 Example Implementation
+
+The package includes a complete example implementation in `src/example/EMVPaymentScreen.tsx`. This example demonstrates:
+
+- Complete UI implementation
+- Event handling
+- Error management
+- Loading states
+- Transaction logging
+- Multiple payment types
+
+To use the example:
+
+```tsx
+import EMVPaymentScreenExample from 'quivio-transaction-processor/example/EMVPaymentScreen';
+
+const myConfig = {
+  merchantID: "YOUR_MERCHANT_ID",
+  onlineMerchantID: "YOUR_ONLINE_MERCHANT_ID",
+  isSandBox: true,
+  secureDeviceName: "YOUR_DEVICE_NAME",
+  operatorID: "YOUR_OPERATOR_ID",
+  posPackageID: "YOUR_POS_PACKAGE_ID"
+};
+
+// Use in your app with your configuration
+<EMVPaymentScreenExample config={myConfig} />
+```
+
+## 🤝 Contributing
+
+We welcome contributions! Please follow these steps:
 
 1. Fork the repository
 2. Create your feature branch (`git checkout -b feature/amazing-feature`)
@@ -335,11 +427,32 @@ The hook provides detailed logging through the `logs` array. You can display the
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
-## License
+### Development Setup
+
+```bash
+# Clone the repository
+git clone https://github.com/RohanAppinventiv/RN-Bridge-App.git
+
+# Install dependencies
+npm install
+
+# Build the package
+npm run build
+
+# Run tests
+npm test
+```
+
+## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## Support
+## 🆘 Support
 
-For support and questions, please open an issue on the GitHub repository or contact the maintainers.
+For support and questions:
+
+- 📧 **Email**: Contact the maintainers
+- 🐛 **Issues**: Open an issue on [GitHub](https://github.com/RohanAppinventiv/RN-Bridge-App)
+- 📖 **Documentation**: Check the example implementation
+
 

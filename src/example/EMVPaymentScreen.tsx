@@ -11,6 +11,7 @@ import {
   Modal,
 } from 'react-native';
 import { useEMVPayment } from '../useEMVPayment';
+import { emvConfig } from '../utils/config';
 import { EMVConfig } from '../types';
 
 const TickIcon = () => (
@@ -20,17 +21,7 @@ const CrossIcon = () => (
   <Text style={{ color: 'red', fontSize: 18, marginRight: 6 }}>❌</Text>
 );
 
-const EMVPaymentScreenExample: React.FC = () => {
-  // EMV Configuration - Replace with your actual values
-  const emvConfig: EMVConfig = {
-    merchantID: "YOUR_MERCHANT_ID",
-    onlineMerchantID: "YOUR_ONLINE_MERCHANT_ID",
-    isSandBox: true, // true for testing, false for production
-    secureDeviceName: "YOUR_DEVICE_NAME", // Terminal device name
-    operatorID: "YOUR_OPERATOR_ID", // Employee ID
-    posPackageID: "YOUR_POS_PACKAGE_ID" // App Bundle ID
-  };
-
+const EMVPaymentScreenExample: React.FC<{ config: EMVConfig }> = ({ config }) => {
   const {
     logs,
     isDeviceConnected,
@@ -52,7 +43,7 @@ const EMVPaymentScreenExample: React.FC = () => {
           {isInitialized ? 'Initialized' : 'Not Initialized'}
         </Text>
       </View>
-      
+
       <View style={styles.statusRow}>
         {isDeviceConnected ? <TickIcon /> : <CrossIcon />}
         <Text style={[styles.statusLabel, { color: isDeviceConnected ? 'green' : 'red' }]}>
@@ -80,7 +71,7 @@ const EMVPaymentScreenExample: React.FC = () => {
         >
           <Text style={styles.ctaButtonText}>Pay via Credit Card</Text>
         </TouchableOpacity>
-        
+
         <TouchableOpacity
           style={[styles.ctaButton, (loading || !isDeviceConnected) ? styles.ctaButtonDisabled : styles.ctaButtonEnabled]}
           onPress={handleInHousePayment}
@@ -98,7 +89,7 @@ const EMVPaymentScreenExample: React.FC = () => {
         >
           <Text style={styles.ctaButtonText}>Setup Recurring</Text>
         </TouchableOpacity>
-        
+
         <TouchableOpacity
           style={[styles.ctaButton, loading ? styles.ctaButtonDisabled : styles.ctaButtonEnabled]}
           onPress={clearAllTransactions}
@@ -111,23 +102,23 @@ const EMVPaymentScreenExample: React.FC = () => {
       <View style={styles.buttonRow}>
         <TouchableOpacity
           style={[styles.ctaButton, (loading || !isDeviceConnected) ? styles.ctaButtonDisabled : styles.ctaButtonEnabled]}
-          onPress={() => {}}
+          onPress={() => { }}
           disabled={loading || !isDeviceConnected}
         >
           <Text style={styles.ctaButtonText}>Upgrade Recurring Account</Text>
         </TouchableOpacity>
-        
+
         <TouchableOpacity
           style={[styles.ctaButton, (loading || !isDeviceConnected) ? styles.ctaButtonDisabled : styles.ctaButtonEnabled]}
-          onPress={() => {}}
+          onPress={() => { }}
           disabled={loading || !isDeviceConnected}
         >
           <Text style={styles.ctaButtonText}>Replace Recurring Card</Text>
         </TouchableOpacity>
-        
+
         <TouchableOpacity
           style={[styles.ctaButton, (loading || !isDeviceConnected) ? styles.ctaButtonDisabled : styles.ctaButtonEnabled]}
-          onPress={() => {}}
+          onPress={() => { }}
           disabled={loading || !isDeviceConnected}
         >
           <Text style={styles.ctaButtonText}>Refund</Text>
