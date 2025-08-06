@@ -125,4 +125,5 @@ dependencies {
     }
     implementation files("libs/dsiEMVAndroid.aar")
     implementation project(":emvCardReaderLib")
+    implementation project(":emvNative")
 }

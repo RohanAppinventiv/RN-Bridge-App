@@ -1,13 +1,21 @@
+import { EMVPaymentScreenExample } from 'quivio-transaction-processor';
 import React, { useState } from 'react';
 import { View, Text, Button, StyleSheet } from 'react-native';
-import EMVPaymentScreen from './src/example/EMVPaymentScreen';
-import { emvConfig } from './src/utils/config';
+
+const emvConfig = {
+  merchantID: "SONNYTAMA35000GP",
+  onlineMerchantID: "SONNYTAMA35000EP",
+  isSandBox: true, // true for testing, false for production
+  secureDeviceName: "EMV_VP3350_DATACAP", // Terminal device name
+  operatorID: "001", // Employee ID
+  posPackageID: "com.quivio.app:1.0.0"
+}
 
 const MainScreen: React.FC = () => {
   const [showEMV, setShowEMV] = useState(false);
 
   if (showEMV) {
-    return <EMVPaymentScreen config={emvConfig} />;
+    return <EMVPaymentScreenExample config={emvConfig} />;
   }
 
   return (
