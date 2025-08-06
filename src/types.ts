@@ -36,3 +36,11 @@ export interface EMVPaymentHook {
     unsubscribeFromEvent: (eventName: EMVEventName, callback: (payload: any) => void) => void;
     EVENTS: Record<EMVEventName, EMVEventName>;
 }
+
+export interface EMVConfig {
+    merchantID: string;
+    onlineMerchantID: string;
+    isSandBox: boolean;
+    secureDeviceName: string;
+    operatorID: string;
+}

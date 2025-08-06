@@ -1,4 +1,4 @@
-# react-native-emv-payment
+# quivio-transaction-processor
 
 A React Native hook for EMV payment integration with DataCap. This package provides a simple and efficient way to integrate EMV card reader functionality into your React Native Android applications.
 
@@ -14,47 +14,56 @@ A React Native hook for EMV payment integration with DataCap. This package provi
 ## Installation
 
 ```bash
-npm install react-native-emv-payment
+npm install quivio-transaction-processor
 # or
-yarn add react-native-emv-payment
+yarn add quivio-transaction-processor
 ```
 
 ### Android Setup
 
 The package includes native Android libraries that need to be properly configured. Follow these steps:
 
-#### 1. Update settings.gradle
+#### 1. Add dsiEMVAndroid.aar file
+
+First, add the `dsiEMVAndroid.aar` file to your `android/app/libs/` folder. This is a critical step as it contains the core EMV functionality.
+
+**Note**: Make sure the `libs` folder exists in your `android/app/` directory. If it doesn't exist, create it first.
+
+#### 2. Update settings.gradle
 
 Add the following lines to your `android/settings.gradle`:
 
 ```gradle
 include ':emvlib'
-project(':emvlib').projectDir = file('../node_modules/react-native-emv-payment/libs/emvlib')
+project(':emvlib').projectDir = file('../node_modules/quivio-transaction-processor/libs/emvlib')
 include ':emvCardReaderLib'
-project(':emvCardReaderLib').projectDir = file('../node_modules/react-native-emv-payment/libs/emvCardReaderLib')
+project(':emvCardReaderLib').projectDir = file('../node_modules/quivio-transaction-processor/libs/emvCardReaderLib')
 include ':emvNative'
-project(':emvNative').projectDir = file('../node_modules/react-native-emv-payment/libs/emvNative')
+project(':emvNative').projectDir = file('../node_modules/quivio-transaction-processor/libs/emvNative')
 ```
 
-#### 2. Update app/build.gradle
+#### 3. Update app/build.gradle
 
 Add the following dependencies to your `android/app/build.gradle`:
 
 ```gradle
 dependencies {
     // ... other dependencies
+    implementation files("libs/dsiEMVAndroid.aar")
     implementation project(":emvlib")
     implementation project(":emvCardReaderLib")
     implementation project(":emvNative")
 }
 ```
 
-#### 3. Update MainApplication.kt
+**Important**: The `implementation files("libs/dsiEMVAndroid.aar")` line is crucial and must be included for the EMV functionality to work.
+
+#### 4. Update MainApplication.kt
 
 Add the import and package registration to your `android/app/src/main/java/com/your-app/MainApplication.kt`:
 
 ```kotlin
-import com.rn_bridge_demo.EMVPaymentPackage
+import com.quivio_transaction_processor.EMVPaymentPackage
 
 class MainApplication : Application(), ReactApplication {
     private val mReactNativeHost = object : ReactNativeHost(this) {
@@ -69,7 +78,7 @@ class MainApplication : Application(), ReactApplication {
 }
 ```
 
-#### 4. Permissions
+#### 5. Permissions
 
 Make sure you have the necessary permissions in your `android/app/src/main/AndroidManifest.xml`:
 
@@ -86,16 +95,25 @@ Make sure you have the necessary permissions in your `android/app/src/main/Andro
 ```tsx
 import React from 'react';
 import { View, Text, Button } from 'react-native';
-import { useEMVPayment } from 'react-native-emv-payment';
+import { useEMVPayment } from 'quivio-transaction-processor';
 
 const PaymentScreen = () => {
+  // EMV Configuration - Replace with your actual values
+  const emvConfig = {
+    merchantID: "YOUR_MERCHANT_ID",
+    onlineMerchantID: "YOUR_ONLINE_MERCHANT_ID",
+    isSandBox: true, // true for testing, false for production
+    secureDeviceName: "YOUR_DEVICE_NAME", // Terminal device name
+    operatorID: "YOUR_OPERATOR_ID" // Employee ID
+  };
+
   const {
     isDeviceConnected,
     loading,
     handleCardPayment,
     setupConfig,
     logs
-  } = useEMVPayment();
+  } = useEMVPayment(emvConfig);
 
   return (
     <View>
@@ -124,9 +142,18 @@ const PaymentScreen = () => {
 ```tsx
 import React, { useEffect } from 'react';
 import { View, Text, Button } from 'react-native';
-import { useEMVPayment } from 'react-native-emv-payment';
+import { useEMVPayment } from 'quivio-transaction-processor';
 
 const AdvancedPaymentScreen = () => {
+  // EMV Configuration - Replace with your actual values
+  const emvConfig = {
+    merchantID: "YOUR_MERCHANT_ID",
+    onlineMerchantID: "YOUR_ONLINE_MERCHANT_ID",
+    isSandBox: true, // true for testing, false for production
+    secureDeviceName: "YOUR_DEVICE_NAME", // Terminal device name
+    operatorID: "YOUR_OPERATOR_ID" // Employee ID
+  };
+
   const {
     isDeviceConnected,
     loading,
@@ -138,7 +165,7 @@ const AdvancedPaymentScreen = () => {
     unsubscribeFromEvent,
     EVENTS,
     logs
-  } = useEMVPayment();
+  } = useEMVPayment(emvConfig);
 
   useEffect(() => {
     // Subscribe to payment events
@@ -188,6 +215,24 @@ const AdvancedPaymentScreen = () => {
 
 The main hook that provides all EMV payment functionality.
 
+#### Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `config` | `EMVConfig` | Yes | EMV configuration object |
+
+#### Configuration Object
+
+```typescript
+interface EMVConfig {
+  merchantID: string;
+  onlineMerchantID: string;
+  isSandBox: boolean;
+  secureDeviceName: string;
+  operatorID: string;
+}
+```
+
 #### Returns
 
 | Property | Type | Description |
@@ -220,6 +265,14 @@ The following events are available for subscription:
 ### Types
 
 ```typescript
+interface EMVConfig {
+  merchantID: string;
+  onlineMerchantID: string;
+  isSandBox: boolean;
+  secureDeviceName: string;
+  operatorID: string;
+}
+
 interface CallbackLog {
   type: string;
   payload: any;

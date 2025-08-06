@@ -24,7 +24,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     window = UIWindow(frame: UIScreen.main.bounds)
 
     factory.startReactNative(
-      withModuleName: "RN_Bridge_Demo",
+      withModuleName: "Quivio_Transaction_Processor",
       in: window,
       launchOptions: launchOptions
     )

@@ -1,4 +1,4 @@
-# RN Bridge Demo: React Native ↔️ Android EMV Payment Integration
+# Quivio Transaction Processor: React Native ↔️ Android EMV Payment Integration
 
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![React Native](https://img.shields.io/badge/React%20Native-0.76%2B-blue)](https://reactnative.dev)

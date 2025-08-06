@@ -11,6 +11,7 @@ import {
   Modal,
 } from 'react-native';
 import { useEMVPayment } from '../useEMVPayment';
+import { EMVConfig } from '../types';
 
 const TickIcon = () => (
   <Text style={{ color: 'green', fontSize: 18, marginRight: 6 }}>✔️</Text>
@@ -19,7 +20,16 @@ const CrossIcon = () => (
   <Text style={{ color: 'red', fontSize: 18, marginRight: 6 }}>❌</Text>
 );
 
-const EMVPaymentScreen: React.FC = () => {
+const EMVPaymentScreenExample: React.FC = () => {
+  // EMV Configuration - Replace with your actual values
+  const emvConfig: EMVConfig = {
+    merchantID: "YOUR_MERCHANT_ID",
+    onlineMerchantID: "YOUR_ONLINE_MERCHANT_ID",
+    isSandBox: true, // true for testing, false for production
+    secureDeviceName: "YOUR_DEVICE_NAME", // Terminal device name
+    operatorID: "YOUR_OPERATOR_ID" // Employee ID
+  };
+
   const {
     logs,
     isDeviceConnected,
@@ -31,7 +41,7 @@ const EMVPaymentScreen: React.FC = () => {
     setupConfig,
     clearAllTransactions,
     cancelOperation,
-  } = useEMVPayment();
+  } = useEMVPayment(emvConfig);
 
   return (
     <View style={styles.container}>
@@ -301,4 +311,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default EMVPaymentScreen;
+export default EMVPaymentScreenExample;

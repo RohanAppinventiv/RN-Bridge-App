@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.rn_bridge_demo"
+    namespace = "com.quivio_transaction_processor"
     compileSdk = 34
 
     defaultConfig {

@@ -1,4 +1,4 @@
-package com.rn_bridge_demo
+package com.quivio_transaction_processor
 
 import com.facebook.react.bridge.ReadableMap
 import com.rohan.emvcardreaderlib.ConfigFactory

@@ -1,7 +1,7 @@
 {
-    "name": "react-native-emv-payment",
-    "version": "1.1.16",
-    "description": "React Native hook for EMV payment integration with DataCap",
+    "name": "quivio-transaction-processor",
+    "version": "1.0.3",
+    "description": "React Native hook for Card payment integration with DataCap",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
     "react-native": "src/index.ts",
@@ -28,12 +28,12 @@
     },
     "keywords": [
         "react-native",
-        "emv",
+        "quivio",
         "payment",
-        "datacap",
-        "card-reader"
+        "card payment",
+        "idtech"
     ],
-    "author": "Ankit Kumar",
+    "author": "Rohan Gupta",
     "license": "MIT",
     "repository": {
         "type": "git",

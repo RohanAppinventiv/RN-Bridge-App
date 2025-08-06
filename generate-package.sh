@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Script to generate react-native-emv-payment package
+# Script to generate quivio-transaction-processor package
 # This script clones the required folders and files to create the package structure
 
 set -e  # Exit on any error
@@ -8,7 +8,7 @@ set -e  # Exit on any error
 echo "Starting package generation..."
 
 # Define the target directory
-TARGET_DIR="react-native-emv-payment"
+TARGET_DIR="quivio-transaction-processor"
 
 # Bump version in package_base_folder
 echo "Bumping version in package_base_folder..."
@@ -26,26 +26,26 @@ fi
 echo "Creating $TARGET_DIR directory..."
 mkdir -p "$TARGET_DIR"
 
-# 1. Clone package_base_folder as react-native-emv-payment
+# 1. Clone package_base_folder as quivio-transaction-processor
 echo "Cloning package_base_folder..."
 cp -r package_base_folder/* "$TARGET_DIR/"
 
-# 2. Clone src root folder to react-native-emv-payment
+# 2. Clone src root folder to quivio-transaction-processor
 echo "Cloning src folder..."
 cp -r src "$TARGET_DIR/"
 
-# 3. Clone android/emvCardReaderLib and android/emvlib to react-native-emv-payment/libs
+# 3. Clone android/emvCardReaderLib and android/emvlib to quivio-transaction-processor/libs
 echo "Cloning emvCardReaderLib and emvlib..."
 mkdir -p "$TARGET_DIR/libs"
 cp -r android/emvCardReaderLib "$TARGET_DIR/libs/"
 cp -r android/emvlib "$TARGET_DIR/libs/"
 
-# 4. Clone android/app/src/main/java to react-native-emv-payment/libs/emvNative/src/main
+# 4. Clone android/app/src/main/java to quivio-transaction-processor/libs/emvNative/src/main
 echo "Cloning Java source files..."
 mkdir -p "$TARGET_DIR/libs/emvNative/src/main"
 cp -r android/app/src/main/java "$TARGET_DIR/libs/emvNative/src/main/"
 
-# 5. Create AndroidManifest.xml in react-native-emv-payment/libs/emvNative/src/main
+# 5. Create AndroidManifest.xml in quivio-transaction-processor/libs/emvNative/src/main
 echo "Creating AndroidManifest.xml..."
 cat > "$TARGET_DIR/libs/emvNative/src/main/AndroidManifest.xml" << 'EOF'
 <?xml version="1.0" encoding="utf-8"?>
@@ -54,13 +54,13 @@ cat > "$TARGET_DIR/libs/emvNative/src/main/AndroidManifest.xml" << 'EOF'
 </manifest>
 EOF
 
-# 6. Clone .npmignore file from react-native-emv-payment-npm-package
+# 6. Clone .npmignore file from package_base_folder
 echo "Cloning .npmignore file..."
-if [ -f "react-native-emv-payment-npm-package/.npmignore" ]; then
-    cp react-native-emv-payment-npm-package/.npmignore "$TARGET_DIR/"
+if [ -f "package_base_folder/.npmignore" ]; then
+    cp package_base_folder/.npmignore "$TARGET_DIR/"
     echo ".npmignore file copied successfully"
 else
-    echo "Warning: .npmignore file not found in react-native-emv-payment-npm-package"
+    echo "Warning: .npmignore file not found in package_base_folder"
 fi
 
 # 7. Remove build directories if they exist
@@ -76,12 +76,12 @@ fi
 
 # Remove specific files that shouldn't be in the package
 echo "Removing specific files..."
-if [ -f "$TARGET_DIR/libs/emvNative/src/main/java/com/rn_bridge_demo/MainActivity.kt" ]; then
-    rm "$TARGET_DIR/libs/emvNative/src/main/java/com/rn_bridge_demo/MainActivity.kt"
+if [ -f "$TARGET_DIR/libs/emvNative/src/main/java/com/quivio_transaction_processor/MainActivity.kt" ]; then
+    rm "$TARGET_DIR/libs/emvNative/src/main/java/com/quivio_transaction_processor/MainActivity.kt"
     echo "Removed MainActivity.kt file"
 fi
-if [ -f "$TARGET_DIR/libs/emvNative/src/main/java/com/rn_bridge_demo/MainApplication.kt" ]; then
-    rm "$TARGET_DIR/libs/emvNative/src/main/java/com/rn_bridge_demo/MainApplication.kt"
+if [ -f "$TARGET_DIR/libs/emvNative/src/main/java/com/quivio_transaction_processor/MainApplication.kt" ]; then
+    rm "$TARGET_DIR/libs/emvNative/src/main/java/com/quivio_transaction_processor/MainApplication.kt"
     echo "Removed MainApplication.kt file"
 fi
 
