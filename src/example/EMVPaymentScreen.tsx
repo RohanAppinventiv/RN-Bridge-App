@@ -27,7 +27,8 @@ const EMVPaymentScreenExample: React.FC = () => {
     onlineMerchantID: "YOUR_ONLINE_MERCHANT_ID",
     isSandBox: true, // true for testing, false for production
     secureDeviceName: "YOUR_DEVICE_NAME", // Terminal device name
-    operatorID: "YOUR_OPERATOR_ID" // Employee ID
+    operatorID: "YOUR_OPERATOR_ID", // Employee ID
+    posPackageID: "YOUR_POS_PACKAGE_ID" // App Bundle ID
   };
 
   const {
@@ -74,7 +75,7 @@ const EMVPaymentScreenExample: React.FC = () => {
 
         <TouchableOpacity
           style={[styles.ctaButton, (loading || !isDeviceConnected) ? styles.ctaButtonDisabled : styles.ctaButtonEnabled]}
-          onPress={() => handleCardPayment('1.50')}
+          onPress={() => handleCardPayment('10.00')}
           disabled={loading || !isDeviceConnected}
         >
           <Text style={styles.ctaButtonText}>Pay via Credit Card</Text>
@@ -92,10 +93,10 @@ const EMVPaymentScreenExample: React.FC = () => {
       <View style={styles.buttonRow}>
         <TouchableOpacity
           style={[styles.ctaButton, (loading || !isDeviceConnected) ? styles.ctaButtonDisabled : styles.ctaButtonEnabled]}
-          onPress={() => runRecurringTransaction('2.00')}
+          onPress={() => runRecurringTransaction('1.50')}
           disabled={loading || !isDeviceConnected}
         >
-          <Text style={styles.ctaButtonText}>Recurring Transaction</Text>
+          <Text style={styles.ctaButtonText}>Setup Recurring</Text>
         </TouchableOpacity>
         
         <TouchableOpacity
@@ -113,7 +114,7 @@ const EMVPaymentScreenExample: React.FC = () => {
           onPress={() => {}}
           disabled={loading || !isDeviceConnected}
         >
-          <Text style={styles.ctaButtonText}>Pre Auth</Text>
+          <Text style={styles.ctaButtonText}>Upgrade Recurring Account</Text>
         </TouchableOpacity>
         
         <TouchableOpacity
@@ -121,7 +122,7 @@ const EMVPaymentScreenExample: React.FC = () => {
           onPress={() => {}}
           disabled={loading || !isDeviceConnected}
         >
-          <Text style={styles.ctaButtonText}>$0 Auth</Text>
+          <Text style={styles.ctaButtonText}>Replace Recurring Card</Text>
         </TouchableOpacity>
         
         <TouchableOpacity

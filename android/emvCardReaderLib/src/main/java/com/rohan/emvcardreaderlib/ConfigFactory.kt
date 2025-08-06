@@ -6,4 +6,5 @@ interface ConfigFactory {
     val isSandBox: Boolean
     val secureDeviceName: String
     val operatorID: String
+    val posPackageID: String
 }

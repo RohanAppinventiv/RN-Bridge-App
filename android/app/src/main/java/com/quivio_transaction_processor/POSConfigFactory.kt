@@ -2,6 +2,7 @@ package com.quivio_transaction_processor
 
 import com.facebook.react.bridge.ReadableMap
 import com.rohan.emvcardreaderlib.ConfigFactory
+import android.util.Log
 
 class POSConfigFactory {
     private class ConfigDTO(
@@ -9,18 +10,26 @@ class POSConfigFactory {
         override val onlineMerchantID: String,
         override val isSandBox: Boolean, // true then "CERT" else "PROD"
         override val secureDeviceName: String, // Terminal device name
-        override val operatorID: String // employee id
+        override val operatorID: String, // employee id
+        override val posPackageID: String // POS package ID
     ): ConfigFactory
 
     companion object {
-        /** Public entry point: build from RN’s ReadableMap */
+        /** Public entry point: build from RN's ReadableMap */
         fun processMap(map: ReadableMap): ConfigFactory {
+            Log.d("POSConfigFactory", "Processing map with keys: ${map.toHashMap().keys}")
+            Log.d("POSConfigFactory", "posPackageID present: ${map.hasKey("posPackageID")}")
+            if (map.hasKey("posPackageID")) {
+                Log.d("POSConfigFactory", "posPackageID value: ${map.getString("posPackageID")}")
+            }
+            
             return ConfigDTO(
                 merchantID       = map.getStringOrThrow("merchantID"),
                 onlineMerchantID = map.getStringOrThrow("onlineMerchantID"),
                 isSandBox        = map.getBooleanOrDefault("isSandBox", true),
                 secureDeviceName = map.getStringOrThrow("secureDeviceName"),
-                operatorID       = map.getStringOrThrow("operatorID")
+                operatorID       = map.getStringOrThrow("operatorID"),
+                posPackageID     = map.getStringOrThrow("posPackageID")
             )
         }
 

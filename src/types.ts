@@ -2,6 +2,7 @@ export const EVENT_NAMES = [
     'onError',
     'onCardReadSuccessfully',
     'onSaleTransactionCompleted',
+    'onRecurringSaleCompleted',
     'onShowMessage',
     'onConfigError',
     'onConfigPingFailed',
@@ -42,4 +43,5 @@ export interface EMVConfig {
     isSandBox: boolean;
     secureDeviceName: string;
     operatorID: string;
+    posPackageID: string;
 }

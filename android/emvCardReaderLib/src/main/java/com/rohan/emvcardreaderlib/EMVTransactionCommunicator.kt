@@ -5,6 +5,7 @@ interface EMVTransactionCommunicator {
     fun onError(errorMessage: String)
     fun onCardReadSuccessfully(cardData: CardData)
     fun onSaleTransactionCompleted(saleDetails: SaleTransactionResponse)
+    fun onRecurringSaleCompleted(recurringDetails: RecurringTransactionResponse)
     fun onShowMessage(message: String)
 }
 
