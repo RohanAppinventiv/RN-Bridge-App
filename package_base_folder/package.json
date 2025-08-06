@@ -10,7 +10,8 @@
         "android/",
         "libs",
         "src/",
-        "react-native.config.js"
+        "react-native.config.js",
+        "LICENSE"
     ],
     "scripts": {
         "build": "tsc",

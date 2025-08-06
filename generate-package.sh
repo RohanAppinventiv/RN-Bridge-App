@@ -30,15 +30,15 @@ mkdir -p "$TARGET_DIR"
 echo "Cloning package_base_folder..."
 cp -r package_base_folder/* "$TARGET_DIR/"
 
+
 # 2. Clone src root folder to quivio-transaction-processor
 echo "Cloning src folder..."
 cp -r src "$TARGET_DIR/"
 
-# 3. Clone android/emvCardReaderLib and android/emvlib to quivio-transaction-processor/libs
-echo "Cloning emvCardReaderLib and emvlib..."
+# 3. Clone android/emvCardReaderLib to quivio-transaction-processor/libs
+echo "Cloning emvCardReaderLib ..."
 mkdir -p "$TARGET_DIR/libs"
 cp -r android/emvCardReaderLib "$TARGET_DIR/libs/"
-cp -r android/emvlib "$TARGET_DIR/libs/"
 
 # 4. Clone android/app/src/main/java to quivio-transaction-processor/libs/emvNative/src/main
 echo "Cloning Java source files..."
@@ -54,7 +54,16 @@ cat > "$TARGET_DIR/libs/emvNative/src/main/AndroidManifest.xml" << 'EOF'
 </manifest>
 EOF
 
-# 6. Clone .npmignore file from package_base_folder
+# 6. Clone LICENSE file from root
+echo "Copying LICENSE file from root..."
+if [ -f "LICENSE" ]; then
+    cp LICENSE "$TARGET_DIR/"
+    echo "LICENSE file copied successfully"
+else
+    echo "Warning: LICENSE file not found in root directory"
+fi
+
+# 7. Clone .npmignore file from package_base_folder
 echo "Cloning .npmignore file..."
 if [ -f "package_base_folder/.npmignore" ]; then
     cp package_base_folder/.npmignore "$TARGET_DIR/"
@@ -63,15 +72,11 @@ else
     echo "Warning: .npmignore file not found in package_base_folder"
 fi
 
-# 7. Remove build directories if they exist
+# 8. Remove build directories if they exist
 echo "Cleaning build directories..."
 if [ -d "$TARGET_DIR/libs/emvCardReaderLib/build" ]; then
     rm -rf "$TARGET_DIR/libs/emvCardReaderLib/build"
     echo "Removed emvCardReaderLib/build directory"
-fi
-if [ -d "$TARGET_DIR/libs/emvlib/build" ]; then
-    rm -rf "$TARGET_DIR/libs/emvlib/build"
-    echo "Removed emvlib/build directory"
 fi
 
 # Remove specific files that shouldn't be in the package
@@ -85,7 +90,7 @@ if [ -f "$TARGET_DIR/libs/emvNative/src/main/java/com/quivio_transaction_process
     echo "Removed MainApplication.kt file"
 fi
 
-# 8. Build the package
+# 9. Build the package
 echo "Building the package..."
 cd "$TARGET_DIR"
 npm run build

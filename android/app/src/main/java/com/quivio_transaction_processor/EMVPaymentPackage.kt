@@ -8,7 +8,6 @@ import com.facebook.react.uimanager.ViewManager
 class EMVPaymentPackage : ReactPackage {
     override fun createNativeModules(reactContext: ReactApplicationContext): List<NativeModule> {
         return listOf(
-                EMVPaymentModule(reactContext),
                 DsiEMVManagerModule(reactContext) // Register the new bridge
         )
     }

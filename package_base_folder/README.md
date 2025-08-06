@@ -37,8 +37,6 @@ First, ensure the `dsiEMVAndroid.aar` file is present in your `android/app/libs/
 Add the following lines to your `android/settings.gradle`:
 
 ```gradle
-include ':emvlib'
-project(':emvlib').projectDir = file('../node_modules/quivio-transaction-processor/libs/emvlib')
 include ':emvCardReaderLib'
 project(':emvCardReaderLib').projectDir = file('../node_modules/quivio-transaction-processor/libs/emvCardReaderLib')
 include ':emvNative'
@@ -53,7 +51,6 @@ Add the following dependencies to your `android/app/build.gradle`:
 dependencies {
     // ... other dependencies
     implementation files("libs/dsiEMVAndroid.aar")
-    implementation project(":emvlib")
     implementation project(":emvCardReaderLib")
     implementation project(":emvNative")
 }

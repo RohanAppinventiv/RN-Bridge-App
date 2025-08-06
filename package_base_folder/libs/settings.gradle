@@ -1,7 +1,6 @@
-include(":emvNative", ":emvlib", ":emvCardReaderLib")
+include(":emvNative", ":emvCardReaderLib")
 
 project(":emvNative").projectDir = file("node_modules/quivio-transaction-processor/android/emvNative")
-project(":emvlib").projectDir = file("node_modules/quivio-transaction-processor/android/emvlib")
 project(":emvCardReaderLib").projectDir = file("node_modules/quivio-transaction-processor/android/emvCardReaderLib")
 
 dependencyResolutionManagement {

@@ -31,6 +31,5 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
 
     // Internal modules
-    implementation(project(":emvlib"))
     implementation(project(":emvCardReaderLib"))
 }

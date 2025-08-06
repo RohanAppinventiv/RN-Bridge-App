@@ -124,6 +124,5 @@ dependencies {
         implementation jscFlavor
     }
     implementation files("libs/dsiEMVAndroid.aar")
-    implementation project(":emvlib")
     implementation project(":emvCardReaderLib")
 }
