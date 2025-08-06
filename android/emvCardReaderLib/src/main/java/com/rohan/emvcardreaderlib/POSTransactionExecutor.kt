@@ -33,6 +33,14 @@ class POSTransactionExecutor(context: Context, posConfig: ConfigFactory) {
         }
     }
 
+    suspend fun doReplaceCardInRecurring() {
+        withContext(Dispatchers.IO){
+            val request = requestBuilder.buildReplaceCardInRecurringRequest()
+            Log.d(PRINT_TAG, "Replace Card in Recurring request prepared: $request")
+            dsiEMVAndroidLib.ProcessTransaction(request)
+        }
+    }
+
     suspend fun collectCardData(){
         withContext(Dispatchers.IO){
             Log.d(PRINT_TAG, "Inside CollectCardData()")

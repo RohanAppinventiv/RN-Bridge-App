@@ -3,6 +3,7 @@ export const EVENT_NAMES = [
     'onCardReadSuccessfully',
     'onSaleTransactionCompleted',
     'onRecurringSaleCompleted',
+    'onReplaceCardCompleted',
     'onShowMessage',
     'onConfigError',
     'onConfigPingFailed',
@@ -26,6 +27,7 @@ export interface EMVPaymentHook {
     handleCardPayment: (amount: string) => void;
     handleInHousePayment: () => void;
     runRecurringTransaction: (amount: string) => void;
+    replaceCardInRecurring: () => void;
     setupConfig: () => void;
     pingConfig: () => void;
     clearTransactionListener: () => void;

@@ -150,6 +150,70 @@ class XMLResponseExtractor {
     }
 
     /**
+     * Extracts ZeroAuth response fields from XML including all specified tags
+     * Returns a ZeroAuth object containing all extracted fields
+     */
+    fun extractZeroAuthResponse(xml: String): ZeroAuthTransactionResponse? = try {
+        // helper to fetch a tag or default to ""
+        val tag: (String) -> String = { name -> getTag(xml, name) ?: "" }
+
+        val amount = Amount(
+            purchase  = tag("Purchase").ifEmpty { "0.00" },
+            gratuity  = tag("Gratuity").ifEmpty { "0.00" },
+            authorize = tag("Authorize").ifEmpty { "0.00" },
+            cashback  = tag("Cashback").ifEmpty { "0.00" }
+        )
+        // construct the comprehensive response
+        ZeroAuthTransactionResponse(
+            // Basic response fields
+            responseOrigin   = tag("ResponseOrigin"),
+            dsixReturnCode  = tag("DSIXReturnCode"),
+            cmdStatus       = tag("CmdStatus"),
+            textResponse    = tag("TextResponse"),
+            sequenceNo      = tag("SequenceNo"),
+            userTrace       = tag("UserTrace"),
+
+            // Transaction details
+            merchantID      = tag("MerchantID"),
+            acctNo          = tag("AcctNo"),
+            cardType        = tag("CardType"),
+            tranCode        = tag("TranCode"),
+            authCode        = tag("AuthCode"),
+            refNo           = tag("RefNo"),
+            invoiceNo       = tag("InvoiceNo"),
+
+            // Amount fields
+            amount         = amount,
+
+            // Additional transaction data
+            acqRefData      = tag("AcqRefData"),
+            processData     = tag("ProcessData"),
+            cardHolderID    = tag("CardHolderID"),
+            recordNo        = tag("RecordNo"),
+            cardholderName  = tag("CardholderName"),
+            entryMethod     = tag("EntryMethod"),
+            date            = tag("Date"),
+            time            = tag("Time"),
+            applicationLabel= tag("ApplicationLabel"),
+
+            // EMV specific fields
+            aid             = tag("AID"),
+            tvr             = tag("TVR"),
+            iad             = tag("IAD"),
+            tsi             = tag("TSI"),
+            arc             = tag("ARC"),
+            cvm             = tag("CVM"),
+            payAPIId        = tag("PayAPI_Id")
+        ).also {
+            Log.d(TAG, "Successfully extracted ComprehensiveTransactionResponse from XML")
+        }
+    } catch (e: Exception) {
+        Log.e(TAG, "Error extracting comprehensive response: ${e.message}")
+        // fall back to an "empty" response
+        null
+    }
+
+    /**
      * Checks if the response indicates a process is already running
      * Returns true if ResponseOrigin is "Client" and DSIXReturnCode is "003002"
      */

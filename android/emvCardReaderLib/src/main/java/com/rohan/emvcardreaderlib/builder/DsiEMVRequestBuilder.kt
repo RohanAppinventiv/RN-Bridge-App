@@ -122,4 +122,29 @@ class DsiEMVRequestBuilder(val config: ConfigFactory) {
         </TStream>
     """.trimIndent()
     }
+
+    fun buildReplaceCardInRecurringRequest(): String {
+        return """<?xml version="1.0"?>
+        <TStream>
+        <Transaction>
+            <OperationMode>${operationMode}</OperationMode>
+            <MerchantID>${merchantID}</MerchantID>
+            <POSPackageID>${posPackageID}</POSPackageID>
+            <UserTrace>${userTrace}</UserTrace>
+            <TranCode>${TransType.EMVZeroAuth.name}</TranCode>
+            <ProcessorToken>TokenRequested</ProcessorToken>
+            <SecureDevice>${secureDevice}</SecureDevice>
+            <InvoiceNo>${createUniqueInvoiceNo()}</InvoiceNo>
+            <RefNo>${createUniqueInvoiceNo()}</RefNo>
+            <Amount>
+                <Purchase>0.00</Purchase>
+            </Amount>
+            <SequenceNo>${sequenceNo}</SequenceNo>
+            <CollectData>CardholderName</CollectData>
+            <RecordNo>RecordNumberRequested</RecordNo>
+            <Frequency>Frequency</Frequency>
+            <CardHolderID>Allow_V2</CardHolderID>
+        </Transaction>
+        </TStream>""".trimIndent()
+    }
 }
