@@ -21,7 +21,7 @@ const CrossIcon = () => (
   <Text style={{ color: 'red', fontSize: 18, marginRight: 6 }}>❌</Text>
 );
 
-const EMVPaymentScreenExample: React.FC<{ config: EMVConfig }> = ({ config }) => {
+const EMVPaymentScreenExample: React.FC<{ config: EMVConfig }> = ({ config = emvConfig }) => {
   const {
     logs,
     isDeviceConnected,
@@ -33,7 +33,7 @@ const EMVPaymentScreenExample: React.FC<{ config: EMVConfig }> = ({ config }) =>
     setupConfig,
     clearAllTransactions,
     cancelOperation,
-  } = useEMVPayment(emvConfig);
+  } = useEMVPayment(config);
 
   return (
     <View style={styles.container}>
