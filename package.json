@@ -10,7 +10,8 @@
     "clean": "cd android && ./gradlew clean && cd ..",
     "test": "jest",
     "generate-package": "./generate-package.sh",
-    "publish-package": "cd quivio-transaction-processor && npm publish --access public"
+    "publish-package": "cd quivio-transaction-processor && npm publish && cd .. && rm -rf quivio-transaction-processor",
+    "publish": "npm run generate-package && npm run publish-package"
   },
   "dependencies": {
     "@react-native-community/blur": "^4.4.1",

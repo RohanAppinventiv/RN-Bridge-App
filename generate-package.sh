@@ -9,10 +9,11 @@ echo "Starting package generation..."
 
 # Define the target directory
 TARGET_DIR="quivio-transaction-processor"
+BASE_DIR="package_base_folder"
 
 # Bump version in package_base_folder
-echo "Bumping version in package_base_folder..."
-cd package_base_folder
+echo "Bumping version in $BASE_DIR..."
+cd $BASE_DIR
 npm version patch
 cd ..
 
@@ -27,8 +28,8 @@ echo "Creating $TARGET_DIR directory..."
 mkdir -p "$TARGET_DIR"
 
 # 1. Clone package_base_folder as quivio-transaction-processor
-echo "Cloning package_base_folder..."
-cp -r package_base_folder/* "$TARGET_DIR/"
+echo "Cloning $BASE_DIR..."
+cp -r $BASE_DIR/* "$TARGET_DIR/"
 
 
 # 2. Clone src root folder to quivio-transaction-processor
@@ -65,11 +66,11 @@ fi
 
 # 7. Clone .npmignore file from package_base_folder
 echo "Cloning .npmignore file..."
-if [ -f "package_base_folder/.npmignore" ]; then
-    cp package_base_folder/.npmignore "$TARGET_DIR/"
+if [ -f "$BASE_DIR/.npmignore" ]; then
+    cp $BASE_DIR/.npmignore "$TARGET_DIR/"
     echo ".npmignore file copied successfully"
 else
-    echo "Warning: .npmignore file not found in package_base_folder"
+    echo "Warning: .npmignore file not found in $BASE_DIR"
 fi
 
 # 8. Remove build directories if they exist
@@ -96,6 +97,32 @@ cd "$TARGET_DIR"
 npm run build
 cd ..
 
+# 10. Retrieve package.json version and create git commit
+echo "Retrieving package version and creating git commit..."
+cd "$TARGET_DIR"
+
+# Read package.json version using Node.js
+VERSION=$(node -e "
+const fs = require('fs');
+const path = require('path');
+const packageJson = require(path.resolve(__dirname, 'package.json'));
+console.log(packageJson.version);
+")
+
+echo "Package version: $VERSION"
+
+# Go back to root directory
+cd ..
+
+# Add package.json to git and commit
+echo "Adding package.json to git..."
+git add "$BASE_DIR/package.json"
+git commit -m "version autoupgrade to $VERSION"
+
 echo "Package generation completed successfully!"
 echo "Generated package is located in: $TARGET_DIR"
+echo "Package version: $VERSION"
+echo "Git commit created with version: $VERSION"
+
+
 
