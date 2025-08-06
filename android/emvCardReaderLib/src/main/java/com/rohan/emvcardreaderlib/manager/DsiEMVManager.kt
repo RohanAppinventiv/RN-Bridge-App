@@ -75,6 +75,12 @@ class DsiEMVManager(
         currentPosState = CrState.SetupRecurringSale
     }
 
+    suspend fun replaceCardInRecurring() = withContext(Dispatchers.IO) {
+        resetPinPad()
+        posTransactionExecutor.doReplaceCardInRecurring()
+        currentPosState = CrState.ReplaceRecurringCard
+    }
+
     fun registerListener(
         communicator: EMVTransactionCommunicator,
         configurationCommunicator: ConfigurationCommunicator? = null
@@ -162,6 +168,12 @@ class DsiEMVManager(
                 val recurringDetails = posXMLResponseExtractor.extractRecurringTransactionResponse(xml)
                 recurringDetails?.let {
                     communicator?.onRecurringSaleCompleted(it)
+                }
+            }
+            CrState.ReplaceRecurringCard -> {
+                val recurringDetails = posXMLResponseExtractor.extractZeroAuthResponse(xml)
+                recurringDetails?.let {
+                    communicator?.onCardReplaceTransactionCompleted(it)
                 }
             }
             CrState.PrePaidCardDataCollect -> {

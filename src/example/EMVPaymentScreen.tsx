@@ -26,10 +26,10 @@ const EMVPaymentScreenExample: React.FC<{ config: EMVConfig }> = ({ config = emv
     logs,
     isDeviceConnected,
     loading,
-    isInitialized,
     handleCardPayment,
     handleInHousePayment,
     runRecurringTransaction,
+    replaceCardInRecurring,
     setupConfig,
     clearAllTransactions,
     cancelOperation,
@@ -37,13 +37,6 @@ const EMVPaymentScreenExample: React.FC<{ config: EMVConfig }> = ({ config = emv
 
   return (
     <View style={styles.container}>
-      <View style={styles.statusRow}>
-        {isInitialized ? <TickIcon /> : <CrossIcon />}
-        <Text style={[styles.statusLabel, { color: isInitialized ? 'green' : 'red' }]}>
-          {isInitialized ? 'Initialized' : 'Not Initialized'}
-        </Text>
-      </View>
-
       <View style={styles.statusRow}>
         {isDeviceConnected ? <TickIcon /> : <CrossIcon />}
         <Text style={[styles.statusLabel, { color: isDeviceConnected ? 'green' : 'red' }]}>
@@ -110,7 +103,7 @@ const EMVPaymentScreenExample: React.FC<{ config: EMVConfig }> = ({ config = emv
 
         <TouchableOpacity
           style={[styles.ctaButton, (loading || !isDeviceConnected) ? styles.ctaButtonDisabled : styles.ctaButtonEnabled]}
-          onPress={() => { }}
+          onPress={replaceCardInRecurring}
           disabled={loading || !isDeviceConnected}
         >
           <Text style={styles.ctaButtonText}>Replace Recurring Card</Text>

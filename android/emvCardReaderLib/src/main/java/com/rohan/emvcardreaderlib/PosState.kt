@@ -8,4 +8,5 @@ sealed interface CrState {
     object PrePaidCardDataCollect: CrState
     object EmvSale: CrState
     object SetupRecurringSale: CrState
+    object ReplaceRecurringCard: CrState
 }

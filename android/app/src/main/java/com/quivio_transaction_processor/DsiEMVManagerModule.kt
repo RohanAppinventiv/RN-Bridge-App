@@ -9,6 +9,7 @@ import com.rohan.emvcardreaderlib.ConfigurationCommunicator
 import com.rohan.emvcardreaderlib.CardData
 import com.rohan.emvcardreaderlib.SaleTransactionResponse
 import com.rohan.emvcardreaderlib.RecurringTransactionResponse
+import com.rohan.emvcardreaderlib.ZeroAuthTransactionResponse
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -88,6 +89,14 @@ class DsiEMVManagerModule(private val reactContext: ReactApplicationContext) :
         Log.d("DsiEMVManagerModule", "runRecurringTransaction called with amount: $amount")
         CoroutineScope(Dispatchers.Main).launch {
             dsiEMVManager?.runRecurringTransaction(amount)
+        }
+    }
+
+    @ReactMethod
+    fun replaceCardInRecurring() {
+        Log.d("DsiEMVManagerModule", "replaceCardInRecurring called")
+        CoroutineScope(Dispatchers.Main).launch {
+            dsiEMVManager?.replaceCardInRecurring()
         }
     }
 
@@ -242,6 +251,57 @@ class DsiEMVManagerModule(private val reactContext: ReactApplicationContext) :
             putString("payAPIId", recurringDetails.payAPIId)
         }
         sendEvent("onRecurringSaleCompleted", map)
+    }
+
+    override fun onCardReplaceTransactionCompleted(zeroAuthData: ZeroAuthTransactionResponse) {
+        Log.d("DsiEMVManagerModule", "onCardReplaceTransactionCompleted")
+        val map = Arguments.createMap().apply {
+            // Basic response fields
+            putString("responseOrigin", zeroAuthData.responseOrigin)
+            putString("dsixReturnCode", zeroAuthData.dsixReturnCode)
+            putString("cmdStatus", zeroAuthData.cmdStatus)
+            putString("textResponse", zeroAuthData.textResponse)
+            putString("sequenceNo", zeroAuthData.sequenceNo)
+            putString("userTrace", zeroAuthData.userTrace)
+            
+            // Transaction details
+            putString("merchantID", zeroAuthData.merchantID)
+            putString("acctNo", zeroAuthData.acctNo)
+            putString("cardType", zeroAuthData.cardType)
+            putString("tranCode", zeroAuthData.tranCode)
+            putString("authCode", zeroAuthData.authCode)
+            putString("refNo", zeroAuthData.refNo)
+            putString("invoiceNo", zeroAuthData.invoiceNo)
+            
+            // Amount fields
+            putMap("amount", Arguments.createMap().apply {
+                putString("purchase", zeroAuthData.amount.purchase)
+                putString("gratuity", zeroAuthData.amount.gratuity)
+                putString("authorize", zeroAuthData.amount.authorize)
+                putString("cashback", zeroAuthData.amount.cashback)
+            })
+            
+            // Additional transaction data
+            putString("acqRefData", zeroAuthData.acqRefData)
+            putString("processData", zeroAuthData.processData)
+            putString("cardHolderID", zeroAuthData.cardHolderID)
+            putString("recordNo", zeroAuthData.recordNo)
+            putString("cardholderName", zeroAuthData.cardholderName)
+            putString("entryMethod", zeroAuthData.entryMethod)
+            putString("date", zeroAuthData.date)
+            putString("time", zeroAuthData.time)
+            putString("applicationLabel", zeroAuthData.applicationLabel)
+            
+            // EMV specific fields
+            putString("aid", zeroAuthData.aid)
+            putString("tvr", zeroAuthData.tvr)
+            putString("iad", zeroAuthData.iad)
+            putString("tsi", zeroAuthData.tsi)
+            putString("arc", zeroAuthData.arc)
+            putString("cvm", zeroAuthData.cvm)
+            putString("payAPIId", zeroAuthData.payAPIId)
+        }
+        sendEvent("onReplaceCardCompleted", map)
     }
 
     override fun onShowMessage(message: String) {

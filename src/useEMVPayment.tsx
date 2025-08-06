@@ -176,6 +176,34 @@ export const useEMVPayment = (config: EMVConfig): EMVPaymentHook => {
                     );
                     setLoading(false);
                     waitingForEvent.current = false;
+                } else if (event === 'onReplaceCardCompleted') {
+                    const {
+                        cmdStatus,
+                        textResponse,
+                        sequenceNo,
+                        userTrace,
+                        captureStatus,
+                        refNo,
+                        invoiceNo,
+                        amount,
+                        cardholderName,
+                        acctNo,
+                        cardType,
+                        authCode,
+                        entryMethod,
+                        recordNo,
+                        acqRefData,
+                        date,
+                        time,
+                        payAPIId
+                    } = payload || {};
+                    
+                    appendLog(
+                        'Replace card in recurring transaction completed',
+                        `Status: ${cmdStatus}\nResponse: ${textResponse}\nSequenceNo: ${sequenceNo}\nUserTrace: ${userTrace}\nCaptureStatus: ${captureStatus}\nRefNo: ${refNo}\nInvoiceNo: ${invoiceNo}\nAmount: ${amount?.purchase}\n\nCardHolderName: ${cardholderName}\nAcctNo: ${acctNo}\ncardType: ${cardType}\nauthCode: ${authCode}\nEntryMethod: ${entryMethod}\n\nRecordNo: ${recordNo}\n\nAcqRefData: ${acqRefData}\nDate: ${date}\nTime: ${time}\nPayAPIID: ${payAPIId}`
+                    );
+                    setLoading(false);
+                    waitingForEvent.current = false;
                 } else if (event === 'onCardReadSuccessfully') {
                     const binNumber = payload?.binNumber;
                     appendLog('Card successfully read', 'Card read successfully And BIN: ' + binNumber);
@@ -262,6 +290,19 @@ export const useEMVPayment = (config: EMVConfig): EMVPaymentHook => {
         }
     }, [appendLog]);
 
+    const replaceCardInRecurring = useCallback(() => {
+        try {
+            setLoading(true);
+            waitingForEvent.current = true;
+            DsiEMVManagerBridge.replaceCardInRecurring();
+            appendLog('Running replace card in recurring', 'Replacing card in recurring transaction');
+        } catch (e) {
+            setLoading(false);
+            waitingForEvent.current = false;
+            appendLog('error', `replaceCardInRecurring failed: ${(e as Error).message}`);
+        }
+    }, [appendLog]);
+
     const setupConfig = useCallback(() => {
         try {
             if (!isInitialized) {
@@ -335,6 +376,7 @@ export const useEMVPayment = (config: EMVConfig): EMVPaymentHook => {
         handleCardPayment: runSaleTransaction,
         handleInHousePayment: collectCardDetails,
         runRecurringTransaction,
+        replaceCardInRecurring,
         setupConfig,
         pingConfig,
         clearTransactionListener,
