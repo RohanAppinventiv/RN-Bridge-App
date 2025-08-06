@@ -1,10 +1,10 @@
 import { EMVConfig } from "../types";
 
 export const emvConfig: EMVConfig = {
-    merchantID: "SONNYTAMA35000GP",
-    onlineMerchantID: "SONNYTAMA35000EP",
+    merchantID: "YOUR_MERCHANT_ID",
+    onlineMerchantID: "YOUR_ONLINE_MERCHANT_ID",
     isSandBox: true, // true for testing, false for production
-    secureDeviceName: "EMV_VP3350_DATACAP", // Terminal device name
-    operatorID: "001", // Employee ID
-    posPackageID: "com.quivio.app:1.0.0" // App Bundle ID
+    secureDeviceName: "SECURE_DEVICE_NAME", // Terminal device name
+    operatorID: "EMPLOYEE_ID", // Employee ID
+    posPackageID: "PACKAGE_NAME_AND_VERSION" // App Bundle ID
 };
