@@ -4,15 +4,16 @@ A comprehensive React Native library for EMV payment integration with DataCap te
 
 ## 🚀 Features
 
-- **🔌 Easy Integration**: Simple hook-based API for React Native
+- **🔌 Easy Integration**: Simple provider-based API for React Native
 - **💳 Full EMV Support**: Complete EMV card reading and processing capabilities
 - **🤖 Android Native**: Optimized native Android implementation with EMV libraries
 - **🔄 Real-time Events**: Comprehensive event system for payment status updates
 - **📊 Built-in Logging**: Detailed transaction logging for debugging and monitoring
 - **⚡ TypeScript Support**: Full TypeScript definitions and type safety
 - **🔄 Recurring Payments**: Support for recurring payment transactions
-- **🎯 Multiple Payment Types**: Support for sale, in-house, and recurring transactions
+- **🎯 Multiple Payment Types**: Support for sale, in-house, recurring, and card replacement transactions
 - **🛡️ Error Handling**: Robust error handling and recovery mechanisms
+- **🎯 Context-Based State Management**: Centralized state management with React Context
 
 ## 📦 Installation
 
@@ -20,6 +21,26 @@ A comprehensive React Native library for EMV payment integration with DataCap te
 npm install quivio-transaction-processor
 # or
 yarn add quivio-transaction-processor
+```
+
+## 🏗️ Architecture Overview
+
+### Context-Based State Management
+The package uses React Context for state management, providing:
+- **Centralized State**: All payment state managed in one place
+- **Automatic Initialization**: EMV manager initialized on provider mount
+- **Event Management**: Built-in event subscription and cleanup
+- **Type Safety**: Full TypeScript support with proper typing
+
+### Provider Pattern
+```tsx
+// Wrap your app or component with PaymentProvider
+<PaymentProvider config={emvConfig}>
+  <YourPaymentComponent />
+</PaymentProvider>
+
+// Use the hook in any child component
+const { handleCardPayment, isDeviceConnected } = useEMVPayment();
 ```
 
 ## 🔧 Android Setup
@@ -81,50 +102,99 @@ class MainApplication : Application(), ReactApplication {
 
 ## 🎯 Quick Start
 
-### Basic Implementation
+### Basic Implementation with PaymentProvider
 
 ```tsx
 import React from 'react';
-import { View, Text, Button } from 'react-native';
-import { useEMVPayment } from 'quivio-transaction-processor';
+import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
+import { PaymentProvider, useEMVPayment, EMVConfig } from 'quivio-transaction-processor';
+
+const emvConfig: EMVConfig = {
+  merchantID: "YOUR_MERCHANT_ID",
+  onlineMerchantID: "YOUR_ONLINE_MERCHANT_ID",
+  isSandBox: true, // true for testing, false for production
+  secureDeviceName: "YOUR_DEVICE_NAME",
+  operatorID: "YOUR_OPERATOR_ID",
+  posPackageID: "com.your_app:1.0" // App Bundle ID and version
+};
 
 const PaymentScreen = () => {
-  const emvConfig = {
-    merchantID: "YOUR_MERCHANT_ID",
-    onlineMerchantID: "YOUR_ONLINE_MERCHANT_ID",
-    isSandBox: true, // true for testing, false for production
-    secureDeviceName: "YOUR_DEVICE_NAME",
-    operatorID: "YOUR_OPERATOR_ID",
-    posPackageID: "YOUR_POS_PACKAGE_ID" // App Bundle ID
-  };
+  return (
+    <PaymentProvider config={emvConfig}>
+      <PaymentContent />
+    </PaymentProvider>
+  );
+};
 
+const PaymentContent = () => {
   const {
+    logs,
     isDeviceConnected,
-    isInitialized,
     loading,
+    isInitialized,
     handleCardPayment,
     setupConfig,
-    logs
-  } = useEMVPayment(emvConfig);
+    EVENTS
+  } = useEMVPayment();
 
   return (
-    <View>
-      <Text>Status: {isInitialized ? 'Initialized' : 'Not Initialized'}</Text>
-      <Text>Device: {isDeviceConnected ? 'Connected' : 'Not Connected'}</Text>
+    <View style={{ flex: 1, padding: 16 }}>
+      <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 10 }}>
+        Status: {isInitialized ? '✅ Initialized' : '❌ Not Initialized'}
+      </Text>
+      <Text style={{ fontSize: 16, marginBottom: 10 }}>
+        Device: {isDeviceConnected ? '✅ Connected' : '❌ Not Connected'}
+      </Text>
       
-      <Button 
-        title="Setup Configuration" 
+      <TouchableOpacity 
+        style={{ 
+          backgroundColor: isDeviceConnected ? '#4CAF50' : '#FF9800', 
+          padding: 12, 
+          borderRadius: 8,
+          marginBottom: 10
+        }}
         onPress={setupConfig}
         disabled={loading}
-      />
+      >
+        <Text style={{ color: 'white', textAlign: 'center' }}>
+          {isDeviceConnected ? 'Configuration Ready' : 'Setup Configuration'}
+        </Text>
+      </TouchableOpacity>
       
-      <Button 
-        title="Process Payment ($5.00)" 
+      <TouchableOpacity 
+        style={{ 
+          backgroundColor: (loading || !isDeviceConnected) ? '#ccc' : '#2196F3', 
+          padding: 12, 
+          borderRadius: 8,
+          marginBottom: 10
+        }}
         onPress={() => handleCardPayment('5.00')}
         disabled={loading || !isDeviceConnected}
-      />
+      >
+        <Text style={{ color: 'white', textAlign: 'center' }}>
+          Process Payment ($5.00)
+        </Text>
+      </TouchableOpacity>
       
-      {loading && <Text>Processing...</Text>}
+      {loading && (
+        <Text style={{ textAlign: 'center', color: '#FF9800', marginBottom: 10 }}>
+          Processing...
+        </Text>
+      )}
+      
+      <ScrollView style={{ flex: 1 }}>
+        {logs.map((log, index) => (
+          <View key={index} style={{ 
+            backgroundColor: '#f5f5f5', 
+            padding: 8, 
+            marginBottom: 5, 
+            borderRadius: 4 
+          }}>
+            <Text style={{ fontWeight: 'bold' }}>{log.type}</Text>
+            <Text>{JSON.stringify(log.payload, null, 2)}</Text>
+          </View>
+        ))}
+      </ScrollView>
     </View>
   );
 };
@@ -134,79 +204,227 @@ const PaymentScreen = () => {
 
 ```tsx
 import React, { useEffect } from 'react';
-import { View, Text, Button } from 'react-native';
-import { useEMVPayment } from 'quivio-transaction-processor';
+import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
+import { PaymentProvider, useEMVPayment, EMVConfig } from 'quivio-transaction-processor';
+
+const emvConfig: EMVConfig = {
+  merchantID: "YOUR_MERCHANT_ID",
+  onlineMerchantID: "YOUR_ONLINE_MERCHANT_ID",
+  isSandBox: true,
+  secureDeviceName: "YOUR_DEVICE_NAME",
+  operatorID: "YOUR_OPERATOR_ID",
+  posPackageID: "com.your_app:1.0"
+};
 
 const AdvancedPaymentScreen = () => {
-  const emvConfig = {
-    merchantID: "YOUR_MERCHANT_ID",
-    onlineMerchantID: "YOUR_ONLINE_MERCHANT_ID",
-    isSandBox: true,
-    secureDeviceName: "YOUR_DEVICE_NAME",
-    operatorID: "YOUR_OPERATOR_ID",
-    posPackageID: "YOUR_POS_PACKAGE_ID"
-  };
+  return (
+    <PaymentProvider config={emvConfig}>
+      <AdvancedPaymentContent />
+    </PaymentProvider>
+  );
+};
 
+const AdvancedPaymentContent = () => {
   const {
+    logs,
     isDeviceConnected,
-    isInitialized,
     loading,
+    isInitialized,
     handleCardPayment,
     handleInHousePayment,
     runRecurringTransaction,
+    replaceCardInRecurring,
     setupConfig,
     pingConfig,
     clearAllTransactions,
     cancelOperation,
     subscribeToEvent,
     unsubscribeFromEvent,
-    EVENTS,
-    logs
-  } = useEMVPayment(emvConfig);
+    EVENTS
+  } = useEMVPayment();
 
   useEffect(() => {
     // Subscribe to payment events
-    const handleSaleCompleted = (payload) => {
+    const saleListener = subscribeToEvent(EVENTS.onSaleTransactionCompleted, (payload) => {
       console.log('Sale completed:', payload);
       // Handle successful sale transaction
-    };
+    });
 
-    const handleCardRead = (payload) => {
+    const cardReadListener = subscribeToEvent(EVENTS.onCardReadSuccessfully, (payload) => {
       console.log('Card read successfully:', payload);
       // Handle card read event
-    };
+    });
 
-    const handleError = (payload) => {
+    const errorListener = subscribeToEvent(EVENTS.onError, (payload) => {
       console.error('Payment error:', payload);
       // Handle error events
-    };
+    });
 
-    // Subscribe to events
-    subscribeToEvent(EVENTS.onSaleTransactionCompleted, handleSaleCompleted);
-    subscribeToEvent(EVENTS.onCardReadSuccessfully, handleCardRead);
-    subscribeToEvent(EVENTS.onError, handleError);
+    const configSuccessListener = subscribeToEvent(EVENTS.onConfigCompleted, (payload) => {
+      console.log('Configuration completed:', payload);
+      // Handle successful configuration
+    });
+
+    const deviceConnectedListener = subscribeToEvent(EVENTS.onConfigPingSuccess, (payload) => {
+      console.log('Device connected:', payload);
+      // Handle device connection success
+    });
 
     // Cleanup on unmount
     return () => {
-      unsubscribeFromEvent(EVENTS.onSaleTransactionCompleted, handleSaleCompleted);
-      unsubscribeFromEvent(EVENTS.onCardReadSuccessfully, handleCardRead);
-      unsubscribeFromEvent(EVENTS.onError, handleError);
+      if (saleListener) unsubscribeFromEvent(EVENTS.onSaleTransactionCompleted, saleListener.listener);
+      if (cardReadListener) unsubscribeFromEvent(EVENTS.onCardReadSuccessfully, cardReadListener.listener);
+      if (errorListener) unsubscribeFromEvent(EVENTS.onError, errorListener.listener);
+      if (configSuccessListener) unsubscribeFromEvent(EVENTS.onConfigCompleted, configSuccessListener.listener);
+      if (deviceConnectedListener) unsubscribeFromEvent(EVENTS.onConfigPingSuccess, deviceConnectedListener.listener);
     };
-  }, []);
+  }, [subscribeToEvent, unsubscribeFromEvent, EVENTS]);
 
   return (
-    <View>
-      <Text>Status: {isInitialized ? 'Initialized' : 'Not Initialized'}</Text>
-      <Text>Device: {isDeviceConnected ? 'Connected' : 'Not Connected'}</Text>
+    <View style={{ flex: 1, padding: 16 }}>
+      <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 10 }}>
+        Status: {isInitialized ? '✅ Initialized' : '❌ Not Initialized'}
+      </Text>
+      <Text style={{ fontSize: 16, marginBottom: 10 }}>
+        Device: {isDeviceConnected ? '✅ Connected' : '❌ Not Connected'}
+      </Text>
       
-      <Button title="Setup Config" onPress={setupConfig} />
-      <Button title="Ping Config" onPress={pingConfig} />
-      <Button title="EMV Sale" onPress={() => handleCardPayment('5.00')} />
-      <Button title="In-House Payment" onPress={handleInHousePayment} />
-      <Button title="Recurring Payment" onPress={() => runRecurringTransaction('5.00')} />
-      <Button title="Clear Logs" onPress={clearAllTransactions} />
+      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginBottom: 10 }}>
+        <TouchableOpacity 
+          style={{ 
+            backgroundColor: '#4CAF50', 
+            padding: 10, 
+            borderRadius: 8,
+            flex: 1,
+            minWidth: 120
+          }}
+          onPress={setupConfig}
+          disabled={loading}
+        >
+          <Text style={{ color: 'white', textAlign: 'center', fontSize: 12 }}>
+            Setup Config
+          </Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity 
+          style={{ 
+            backgroundColor: '#2196F3', 
+            padding: 10, 
+            borderRadius: 8,
+            flex: 1,
+            minWidth: 120
+          }}
+          onPress={pingConfig}
+          disabled={loading}
+        >
+          <Text style={{ color: 'white', textAlign: 'center', fontSize: 12 }}>
+            Ping Config
+          </Text>
+        </TouchableOpacity>
+      </View>
       
-      {loading && <Text>Processing...</Text>}
+      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginBottom: 10 }}>
+        <TouchableOpacity 
+          style={{ 
+            backgroundColor: (loading || !isDeviceConnected) ? '#ccc' : '#9C27B0', 
+            padding: 10, 
+            borderRadius: 8,
+            flex: 1,
+            minWidth: 120
+          }}
+          onPress={() => handleCardPayment('5.00')}
+          disabled={loading || !isDeviceConnected}
+        >
+          <Text style={{ color: 'white', textAlign: 'center', fontSize: 12 }}>
+            EMV Sale
+          </Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity 
+          style={{ 
+            backgroundColor: (loading || !isDeviceConnected) ? '#ccc' : '#FF5722', 
+            padding: 10, 
+            borderRadius: 8,
+            flex: 1,
+            minWidth: 120
+          }}
+          onPress={handleInHousePayment}
+          disabled={loading || !isDeviceConnected}
+        >
+          <Text style={{ color: 'white', textAlign: 'center', fontSize: 12 }}>
+            In-House
+          </Text>
+        </TouchableOpacity>
+      </View>
+      
+      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginBottom: 10 }}>
+        <TouchableOpacity 
+          style={{ 
+            backgroundColor: (loading || !isDeviceConnected) ? '#ccc' : '#607D8B', 
+            padding: 10, 
+            borderRadius: 8,
+            flex: 1,
+            minWidth: 120
+          }}
+          onPress={() => runRecurringTransaction('5.00')}
+          disabled={loading || !isDeviceConnected}
+        >
+          <Text style={{ color: 'white', textAlign: 'center', fontSize: 12 }}>
+            Recurring
+          </Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity 
+          style={{ 
+            backgroundColor: (loading || !isDeviceConnected) ? '#ccc' : '#795548', 
+            padding: 10, 
+            borderRadius: 8,
+            flex: 1,
+            minWidth: 120
+          }}
+          onPress={replaceCardInRecurring}
+          disabled={loading || !isDeviceConnected}
+        >
+          <Text style={{ color: 'white', textAlign: 'center', fontSize: 12 }}>
+            Replace Card
+          </Text>
+        </TouchableOpacity>
+      </View>
+      
+      <TouchableOpacity 
+        style={{ 
+          backgroundColor: '#F44336', 
+          padding: 10, 
+          borderRadius: 8,
+          marginBottom: 10
+        }}
+        onPress={clearAllTransactions}
+        disabled={loading}
+      >
+        <Text style={{ color: 'white', textAlign: 'center' }}>
+          Clear Logs
+        </Text>
+      </TouchableOpacity>
+      
+      {loading && (
+        <Text style={{ textAlign: 'center', color: '#FF9800', marginBottom: 10 }}>
+          Processing...
+        </Text>
+      )}
+      
+      <ScrollView style={{ flex: 1 }}>
+        {logs.map((log, index) => (
+          <View key={index} style={{ 
+            backgroundColor: '#f5f5f5', 
+            padding: 8, 
+            marginBottom: 5, 
+            borderRadius: 4 
+          }}>
+            <Text style={{ fontWeight: 'bold' }}>{log.type}</Text>
+            <Text>{JSON.stringify(log.payload, null, 2)}</Text>
+          </View>
+        ))}
+      </ScrollView>
     </View>
   );
 };
@@ -214,15 +432,16 @@ const AdvancedPaymentScreen = () => {
 
 ## 📚 API Reference
 
-### useEMVPayment Hook
+### PaymentProvider Component
 
-The main hook that provides all EMV payment functionality.
+The main provider component that manages EMV payment state and initialization.
 
-#### Parameters
+#### Props
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
+| Prop | Type | Required | Description |
+|------|------|----------|-------------|
 | `config` | `EMVConfig` | Yes | EMV configuration object |
+| `children` | `React.ReactNode` | Yes | Child components |
 
 #### Configuration Object
 
@@ -233,9 +452,17 @@ interface EMVConfig {
   isSandBox: boolean;           // true for testing, false for production
   secureDeviceName: string;     // Terminal device name
   operatorID: string;           // Employee/operator ID
-  posPackageID: string;         // App Bundle ID
+  posPackageID: string;         // App Bundle ID and version
 }
 ```
+
+### useEMVPayment Hook
+
+The main hook that provides all EMV payment functionality. Must be used within a `PaymentProvider`.
+
+#### Parameters
+
+None - the hook automatically uses the configuration from the `PaymentProvider`.
 
 #### Returns
 
@@ -248,12 +475,14 @@ interface EMVConfig {
 | `handleCardPayment` | `(amount: string) => void` | Process EMV card payment |
 | `handleInHousePayment` | `() => void` | Process in-house payment |
 | `runRecurringTransaction` | `(amount: string) => void` | Process recurring payment |
+| `replaceCardInRecurring` | `() => void` | Replace card in recurring setup |
 | `setupConfig` | `() => void` | Setup device configuration |
 | `pingConfig` | `() => void` | Ping device configuration |
+| `clearTransactionListener` | `() => void` | Clear transaction listener |
 | `clearAllTransactions` | `() => void` | Clear all transaction logs |
 | `cancelOperation` | `() => void` | Cancel current operation |
 | `initializeEMV` | `() => void` | Manually initialize EMV |
-| `subscribeToEvent` | `(eventName, callback) => void` | Subscribe to events |
+| `subscribeToEvent` | `(eventName, callback) => Listener` | Subscribe to events |
 | `unsubscribeFromEvent` | `(eventName, callback) => void` | Unsubscribe from events |
 | `EVENTS` | `Record<EMVEventName, EMVEventName>` | Available event names |
 
@@ -387,32 +616,50 @@ The hook provides detailed logging through the `logs` array. Display these logs 
 
 ## 📱 Example Implementation
 
-The package includes a complete example implementation in `src/example/EMVPaymentScreen.tsx`. This example demonstrates:
+The package includes a complete example implementation that demonstrates:
 
-- Complete UI implementation
-- Event handling
-- Error management
-- Loading states
-- Transaction logging
-- Multiple payment types
+- Complete UI implementation with modern styling
+- Event handling with proper cleanup
+- Error management and user feedback
+- Loading states and disabled buttons
+- Transaction logging with formatted display
+- Multiple payment types (sale, in-house, recurring, card replacement)
 
-To use the example:
+### Using the Complete Example Component
 
 ```tsx
-import EMVPaymentScreenExample from 'quivio-transaction-processor/example/EMVPaymentScreen';
+import React from 'react';
+import { EMVPaymentScreenExample, EMVConfig } from 'quivio-transaction-processor';
 
-const myConfig = {
-  merchantID: "YOUR_MERCHANT_ID",
-  onlineMerchantID: "YOUR_ONLINE_MERCHANT_ID",
-  isSandBox: true,
-  secureDeviceName: "YOUR_DEVICE_NAME",
-  operatorID: "YOUR_OPERATOR_ID",
-  posPackageID: "YOUR_POS_PACKAGE_ID"
+const App = () => {
+  const emvConfig: EMVConfig = {
+    merchantID: "YOUR_MERCHANT_ID",
+    onlineMerchantID: "YOUR_ONLINE_MERCHANT_ID",
+    isSandBox: true,
+    secureDeviceName: "YOUR_DEVICE_NAME",
+    operatorID: "YOUR_OPERATOR_ID",
+    posPackageID: "com.your_app:1.0"
+  };
+
+  return <EMVPaymentScreenExample config={emvConfig} />;
 };
-
-// Use in your app with your configuration
-<EMVPaymentScreenExample config={myConfig} />
 ```
+
+### Example Features
+
+The example component includes:
+
+- **Device Status Display**: Real-time connection status with visual indicators
+- **Configuration Management**: Setup and ping device configuration
+- **Payment Operations**: 
+  - Credit card payments
+  - In-house payment collection
+  - Recurring payment setup
+  - Card replacement in recurring setups
+- **Transaction Logging**: Detailed logs with timestamps and formatted display
+- **Error Handling**: Comprehensive error management with user feedback
+- **Loading States**: Visual feedback during operations
+- **Modern UI**: Styled buttons and responsive layout
 
 ## 🤝 Contributing
 
