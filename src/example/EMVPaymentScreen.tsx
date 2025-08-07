@@ -11,7 +11,6 @@ import {
   Modal,
 } from 'react-native';
 import { useEMVPayment } from '../useEMVPayment';
-import { emvConfig } from '../utils/config';
 import { EMVConfig } from '../types';
 
 const TickIcon = () => (
@@ -21,7 +20,7 @@ const CrossIcon = () => (
   <Text style={{ color: 'red', fontSize: 18, marginRight: 6 }}>❌</Text>
 );
 
-const EMVPaymentScreenExample: React.FC<{ config: EMVConfig }> = ({ config = emvConfig }) => {
+const EMVPaymentScreenExample: React.FC<{ config: EMVConfig }> = ({ config }) => {
   const {
     logs,
     isDeviceConnected,
