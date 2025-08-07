@@ -52,17 +52,19 @@ RN-Bridge-App/
 │       
 │
 ├── 📦 Quivio Transaction Processor Package
-│   ├── package_base_folder/       # NPM package source
 │   ├── src/                      # TypeScript source code
-│   │   ├── useEMVPayment.tsx     # Main React Native hook
+│   │   ├── index.ts              # Main package exports
 │   │   ├── types.ts              # TypeScript definitions
+│   │   ├── PaymentProvider.tsx   # React Context Provider
+│   │   ├── useEMVPayment.tsx    # Main React hook
 │   │   └── example/              # Example implementations
+│   │       └── EMVPaymentScreen.tsx
+│   ├── package_base_folder/      # NPM package source
 │   └── generate-package.sh       # Package generation script
 │
 └── 📚 Documentation
     ├── README.md                 # This file
-    ├── LICENSE                   # MIT License
-    └── package_base_folder/README.md  # Package documentation
+    └── LICENSE                   # MIT License
 ```
 
 ---
@@ -150,22 +152,36 @@ yarn android
 4. **Real-time Logging**: View detailed transaction logs and events
 
 ### Using the Package in Your App
+
+#### Basic Usage with PaymentProvider
 ```tsx
-import { useEMVPayment } from 'quivio-transaction-processor';
+import React from 'react';
+import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
+import { PaymentProvider, useEMVPayment, EMVConfig } from 'quivio-transaction-processor';
+
+const emvConfig: EMVConfig = {
+  merchantID: "YOUR_MERCHANT_ID",
+  onlineMerchantID: "YOUR_ONLINE_MERCHANT_ID",
+  isSandBox: true, // true for testing, false for production
+  secureDeviceName: "YOUR_DEVICE_NAME",
+  operatorID: "YOUR_OPERATOR_ID",
+  posPackageID: "com.your_app:1.0"
+};
 
 const PaymentScreen = () => {
-  const emvConfig = {
-    merchantID: "YOUR_MERCHANT_ID",
-    onlineMerchantID: "YOUR_ONLINE_MERCHANT_ID",
-    isSandBox: true,
-    secureDeviceName: "YOUR_DEVICE_NAME",
-    operatorID: "YOUR_OPERATOR_ID",
-    posPackageID: "YOUR_POS_PACKAGE_ID"
-  };
+  return (
+    <PaymentProvider config={emvConfig}>
+      <PaymentContent />
+    </PaymentProvider>
+  );
+};
 
+const PaymentContent = () => {
   const {
+    logs,
     isDeviceConnected,
     loading,
+    isInitialized,
     handleCardPayment,
     handleInHousePayment,
     runRecurringTransaction,
@@ -175,43 +191,91 @@ const PaymentScreen = () => {
     clearAllTransactions,
     cancelOperation,
     EVENTS
-  } = useEMVPayment(emvConfig);
+  } = useEMVPayment();
 
   return (
     <View style={{ flex: 1, padding: 16 }}>
-      <Text>Device Status: {isDeviceConnected ? 'Connected' : 'Not Connected'}</Text>
+      <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 10 }}>
+        Device Status: {isDeviceConnected ? '✅ Connected' : '❌ Not Connected'}
+      </Text>
       
-      <Button 
-        title="Setup Configuration" 
+      <TouchableOpacity 
+        style={{ 
+          backgroundColor: isDeviceConnected ? '#4CAF50' : '#FF9800', 
+          padding: 12, 
+          borderRadius: 8,
+          marginBottom: 10
+        }}
         onPress={setupConfig}
         disabled={loading}
-      />
+      >
+        <Text style={{ color: 'white', textAlign: 'center' }}>
+          {isDeviceConnected ? 'Configuration Ready' : 'Setup Configuration'}
+        </Text>
+      </TouchableOpacity>
       
-      <Button 
-        title="Process Payment ($5.00)" 
+      <TouchableOpacity 
+        style={{ 
+          backgroundColor: (loading || !isDeviceConnected) ? '#ccc' : '#2196F3', 
+          padding: 12, 
+          borderRadius: 8,
+          marginBottom: 10
+        }}
         onPress={() => handleCardPayment('5.00')}
         disabled={loading || !isDeviceConnected}
-      />
+      >
+        <Text style={{ color: 'white', textAlign: 'center' }}>
+          Process Payment ($5.00)
+        </Text>
+      </TouchableOpacity>
       
-      <Button 
-        title="Setup Recurring ($2.00)" 
+      <TouchableOpacity 
+        style={{ 
+          backgroundColor: (loading || !isDeviceConnected) ? '#ccc' : '#9C27B0', 
+          padding: 12, 
+          borderRadius: 8,
+          marginBottom: 10
+        }}
         onPress={() => runRecurringTransaction('2.00')}
         disabled={loading || !isDeviceConnected}
-      />
+      >
+        <Text style={{ color: 'white', textAlign: 'center' }}>
+          Setup Recurring ($2.00)
+        </Text>
+      </TouchableOpacity>
       
-      <Button 
-        title="Replace Card" 
+      <TouchableOpacity 
+        style={{ 
+          backgroundColor: (loading || !isDeviceConnected) ? '#ccc' : '#FF5722', 
+          padding: 12, 
+          borderRadius: 8,
+          marginBottom: 10
+        }}
         onPress={replaceCardInRecurring}
         disabled={loading || !isDeviceConnected}
-      />
+      >
+        <Text style={{ color: 'white', textAlign: 'center' }}>
+          Replace Card
+        </Text>
+      </TouchableOpacity>
       
-      {loading && <Text>Processing...</Text>}
+      {loading && (
+        <Text style={{ textAlign: 'center', color: '#FF9800', marginBottom: 10 }}>
+          Processing...
+        </Text>
+      )}
       
-      <ScrollView>
+      <ScrollView style={{ flex: 1 }}>
         {logs.map((log, index) => (
-          <Text key={index}>
-            {log.type}: {JSON.stringify(log.payload)}
-          </Text>
+          <View key={index} style={{ 
+            backgroundColor: '#f5f5f5', 
+            padding: 8, 
+            marginBottom: 5, 
+            borderRadius: 4 
+          }}>
+            <Text style={{ fontWeight: 'bold' }}>{log.type}</Text>
+            <Text>{JSON.stringify(log.payload, null, 2)}</Text>
+          </View>
         ))}
       </ScrollView>
     </View>
@@ -221,22 +285,72 @@ const PaymentScreen = () => {
 
 ### Event Handling
 ```tsx
-const { subscribeToEvent, EVENTS } = useEMVPayment(config);
+import React, { useEffect } from 'react';
+import { useEMVPayment } from 'quivio-transaction-processor';
 
-useEffect(() => {
-  // Subscribe to specific events
-  subscribeToEvent(EVENTS.onSaleTransactionCompleted, (payload) => {
-    console.log('Sale completed:', payload);
-  });
-  
-  subscribeToEvent(EVENTS.onReplaceCardCompleted, (payload) => {
-    console.log('Card replacement completed:', payload);
-  });
-  
-  subscribeToEvent(EVENTS.onError, (error) => {
-    console.error('Payment error:', error);
-  });
-}, []);
+const PaymentComponent = () => {
+  const { subscribeToEvent, unsubscribeFromEvent, EVENTS } = useEMVPayment();
+
+  useEffect(() => {
+    // Subscribe to specific events
+    const saleListener = subscribeToEvent(EVENTS.onSaleTransactionCompleted, (payload) => {
+      console.log('Sale completed:', payload);
+      // Handle successful sale transaction
+    });
+    
+    const replaceCardListener = subscribeToEvent(EVENTS.onReplaceCardCompleted, (payload) => {
+      console.log('Card replacement completed:', payload);
+      // Handle successful card replacement
+    });
+    
+    const errorListener = subscribeToEvent(EVENTS.onError, (error) => {
+      console.error('Payment error:', error);
+      // Handle payment errors
+    });
+
+    const configSuccessListener = subscribeToEvent(EVENTS.onConfigCompleted, (payload) => {
+      console.log('Configuration completed:', payload);
+      // Handle successful configuration
+    });
+
+    const deviceConnectedListener = subscribeToEvent(EVENTS.onConfigPingSuccess, (payload) => {
+      console.log('Device connected:', payload);
+      // Handle device connection success
+    });
+
+    // Cleanup listeners when component unmounts
+    return () => {
+      if (saleListener) unsubscribeFromEvent(EVENTS.onSaleTransactionCompleted, saleListener.listener);
+      if (replaceCardListener) unsubscribeFromEvent(EVENTS.onReplaceCardCompleted, replaceCardListener.listener);
+      if (errorListener) unsubscribeFromEvent(EVENTS.onError, errorListener.listener);
+      if (configSuccessListener) unsubscribeFromEvent(EVENTS.onConfigCompleted, configSuccessListener.listener);
+      if (deviceConnectedListener) unsubscribeFromEvent(EVENTS.onConfigPingSuccess, deviceConnectedListener.listener);
+    };
+  }, [subscribeToEvent, unsubscribeFromEvent, EVENTS]);
+
+  return (
+    // Your component JSX
+  );
+};
+```
+
+### Using the Complete Example Component
+```tsx
+import React from 'react';
+import { EMVPaymentScreenExample, EMVConfig } from 'quivio-transaction-processor';
+
+const App = () => {
+  const emvConfig: EMVConfig = {
+    merchantID: "YOUR_MERCHANT_ID",
+    onlineMerchantID: "YOUR_ONLINE_MERCHANT_ID",
+    isSandBox: true,
+    secureDeviceName: "YOUR_DEVICE_NAME",
+    operatorID: "YOUR_OPERATOR_ID",
+    posPackageID: "com.your_app:1.0"
+  };
+
+  return <EMVPaymentScreenExample config={emvConfig} />;
+};
 ```
 
 ---
@@ -267,10 +381,33 @@ This will generate and publish the package to npm.
 quivio-transaction-processor/
 ├── dist/                    # Built JavaScript files
 ├── src/                     # TypeScript source
+│   ├── index.ts             # Main package exports
+│   ├── types.ts             # TypeScript definitions
+│   ├── PaymentProvider.tsx  # React Context Provider
+│   ├── useEMVPayment.tsx   # Main React hook
+│   └── example/             # Example implementations
+│       └── EMVPaymentScreen.tsx
 ├── android/                 # Native Android modules
 ├── libs/                    # Android libraries
 ├── package.json             # Package configuration
 └── README.md               # Package documentation
+```
+
+### Main Exports
+```typescript
+// Main exports from the package
+export {
+  PaymentProvider,           // React Context Provider
+  useEMVPayment,            // Main React hook
+  EMVPaymentScreenExample   // Complete example component
+};
+
+export type {
+  EMVEventName,             // Event name types
+  CallbackLog,              // Log entry type
+  EMVPaymentHook,           // Hook interface
+  EMVConfig                 // Configuration interface
+};
 ```
 
 ---
@@ -280,6 +417,8 @@ quivio-transaction-processor/
 ### React Native Bridge Architecture
 ```
 React Native App (TypeScript)
+   ↓
+PaymentProvider (React Context)
    ↓
 useEMVPayment Hook (TypeScript)
    ↓
@@ -302,6 +441,7 @@ Hardware Response → SDK → EMV Manager → Native Module → React Native Eve
 ### Key Components
 
 #### React Native Layer
+- **`PaymentProvider`**: React Context Provider for payment state management
 - **`useEMVPayment`**: Main hook providing payment functionality
 - **`EMVPaymentScreenExample`**: Complete example implementation
 - **`types.ts`**: TypeScript definitions and interfaces
@@ -317,6 +457,28 @@ Hardware Response → SDK → EMV Manager → Native Module → React Native Eve
 - **`dsiEMVAndroid.aar`**: DataCap's EMV payment SDK
 - **XML-based Communication**: Standard EMV protocol
 - **Secure Device Communication**: Hardware-level security
+
+---
+
+## 🔧 Architecture Overview
+
+### Context-Based State Management
+The package uses React Context for state management, providing:
+- **Centralized State**: All payment state managed in one place
+- **Automatic Initialization**: EMV manager initialized on provider mount
+- **Event Management**: Built-in event subscription and cleanup
+- **Type Safety**: Full TypeScript support with proper typing
+
+### Provider Pattern
+```tsx
+// Wrap your app or component with PaymentProvider
+<PaymentProvider config={emvConfig}>
+  <YourPaymentComponent />
+</PaymentProvider>
+
+// Use the hook in any child component
+const { handleCardPayment, isDeviceConnected } = useEMVPayment();
+```
 
 ---
 
@@ -348,6 +510,27 @@ const EVENT_NAMES = [
   'onConfigPingSuccess',        // Configuration ping success
   'onConfigCompleted',          // Configuration setup completed
 ] as const;
+
+// Available hook methods:
+interface EMVPaymentHook {
+  logs: CallbackLog[];                    // Transaction logs
+  isDeviceConnected: boolean;             // Device connection status
+  loading: boolean;                       // Loading state
+  isInitialized: boolean;                 // Initialization status
+  handleCardPayment: (amount: string) => void;           // Process card payment
+  handleInHousePayment: () => void;                      // Collect card details
+  runRecurringTransaction: (amount: string) => void;     // Setup recurring payment
+  replaceCardInRecurring: () => void;                    // Replace card in recurring
+  setupConfig: () => void;                               // Setup device configuration
+  pingConfig: () => void;                                // Ping device status
+  clearTransactionListener: () => void;                  // Clear transaction listener
+  clearAllTransactions: () => void;                      // Clear all logs
+  cancelOperation: () => void;                           // Cancel current operation
+  initializeEMV: () => void;                             // Initialize EMV manager
+  subscribeToEvent: (eventName: EMVEventName, callback: (payload: any) => void) => void;
+  unsubscribeFromEvent: (eventName: EMVEventName, callback: (payload: any) => void) => void;
+  EVENTS: Record<EMVEventName, EMVEventName>;           // Available events
+}
 ```
 
 ---
@@ -436,6 +619,5 @@ For support and questions:
 - [ ] Performance optimizations
 - [ ] Pay via In-house cards
 
----
 
-*Built with ❤️ by the Quivio team*
+

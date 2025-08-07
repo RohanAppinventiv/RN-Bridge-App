@@ -3,15 +3,15 @@ import React from 'react';
 import {
   View,
   Text,
-  Button,
   ScrollView,
   StyleSheet,
   TouchableOpacity,
   ActivityIndicator,
   Modal,
 } from 'react-native';
-import { useEMVPayment } from '../useEMVPayment';
 import { EMVConfig } from '../types';
+import { PaymentProvider } from '../PaymentProvider';
+import { useEMVPayment } from '../useEMVPayment';
 
 const TickIcon = () => (
   <Text style={{ color: 'green', fontSize: 18, marginRight: 6 }}>✔️</Text>
@@ -21,6 +21,14 @@ const CrossIcon = () => (
 );
 
 const EMVPaymentScreenExample: React.FC<{ config: EMVConfig }> = ({ config }) => {
+  return (
+    <PaymentProvider config={config}>
+      <ExampleContent />
+    </PaymentProvider>
+  );
+};
+
+const ExampleContent = () => {
   const {
     logs,
     isDeviceConnected,
@@ -32,8 +40,7 @@ const EMVPaymentScreenExample: React.FC<{ config: EMVConfig }> = ({ config }) =>
     setupConfig,
     clearAllTransactions,
     cancelOperation,
-  } = useEMVPayment(config);
-
+  } = useEMVPayment();
   return (
     <View style={styles.container}>
       <View style={styles.statusRow}>
@@ -158,8 +165,8 @@ const EMVPaymentScreenExample: React.FC<{ config: EMVConfig }> = ({ config }) =>
         )}
       </ScrollView>
     </View>
-  );
-};
+  )
+}
 
 const styles = StyleSheet.create({
   container: {
