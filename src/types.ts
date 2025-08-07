@@ -39,6 +39,8 @@ export interface EMVPaymentHook {
     EVENTS: Record<EMVEventName, EMVEventName>;
 }
 
+export interface PaymentContextType extends EMVPaymentHook { }
+
 export interface EMVConfig {
     merchantID: string;
     onlineMerchantID: string;

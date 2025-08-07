@@ -9,10 +9,3 @@ import { name as appName } from './app.json';
 
 AppRegistry.registerComponent(appName, () => App);
 
-
-/**
- * @format
- * For NPM Package Only
- */
-// import { useEmvpPayment } from './useEMVPayment'
-// export { useEmvpPayment }

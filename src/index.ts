@@ -1,9 +1,14 @@
 
-import { useEMVPayment } from './useEMVPayment';
 import EMVPaymentScreenExample from './example/EMVPaymentScreen';
+import { PaymentProvider } from './PaymentProvider';
+import { useEMVPayment } from './useEMVPayment';
 
-export type { EMVEventName, CallbackLog, EMVPaymentHook } from './types';
+export type { EMVEventName, CallbackLog, EMVPaymentHook, EMVConfig } from './types';
 
-export { EMVPaymentScreenExample, useEMVPayment };
+export {
+    EMVPaymentScreenExample,
+    PaymentProvider,
+    useEMVPayment
+};
 
-export default useEMVPayment;
+export default PaymentProvider;
