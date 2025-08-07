@@ -127,6 +127,7 @@ class DsiEMVRequestBuilder(val config: ConfigFactory) {
         return """<?xml version="1.0"?>
         <TStream>
         <Transaction>
+            <ComPort>${comPort}</ComPort>
             <OperationMode>${operationMode}</OperationMode>
             <MerchantID>${merchantID}</MerchantID>
             <POSPackageID>${posPackageID}</POSPackageID>
