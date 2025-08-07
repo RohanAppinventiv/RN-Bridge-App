@@ -1,5 +1,5 @@
 {
-  "name": "RN_Bridge_Demo",
+  "name": "Quivio_Transaction_Processor",
   "version": "0.0.1",
   "private": true,
   "scripts": {
@@ -7,12 +7,18 @@
     "ios": "react-native run-ios",
     "lint": "eslint .",
     "start": "react-native start",
-    "test": "jest"
+    "clean": "cd android && ./gradlew clean && cd ..",
+    "test": "jest",
+    "generate-package": "./generate-package.sh",
+    "publish-package": "cd quivio-transaction-processor && npm publish && cd .. && rm -rf quivio-transaction-processor",
+    "publish": "npm run generate-package && npm run publish-package"
   },
   "dependencies": {
+    "@react-native-community/blur": "^4.4.1",
+    "@react-native/new-app-screen": "0.80.0",
     "react": "19.1.0",
     "react-native": "0.80.0",
-    "@react-native/new-app-screen": "0.80.0"
+    "react-native-safe-area-context": "^5.5.1"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
