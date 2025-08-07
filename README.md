@@ -391,17 +391,6 @@ npm start
 - **React Native**: Use functional components with hooks
 - **Documentation**: Update README and inline comments
 
-### Testing
-```bash
-# Run tests
-npm test
-
-# Run linting
-npm run lint
-
-# Build package
-npm run generate-package
-```
 
 ---
 
@@ -424,7 +413,7 @@ For support and questions:
 ## 📚 Learn More
 
 - [React Native Documentation](https://reactnative.dev/docs/getting-started)
-- [Android Native Modules](https://reactnative.dev/docs/native-modules-android)
+- [Android Native Modules](https://reactnative.dev/docs/legacy/native-modules-android)
 - [DataCap Systems](https://datacapsystems.com/)
 - [EMV Payment Standards](https://www.emvco.com/)
 - [Kotlin for Android](https://kotlinlang.org/docs/android-overview.html)
@@ -441,14 +430,11 @@ For support and questions:
 
 ## 📈 Roadmap
 
-- [ ] iOS support implementation
+- [ ] All cases of Recurring Account
 - [ ] Additional payment methods (contactless, mobile payments)
 - [ ] Enhanced error handling and recovery
 - [ ] Performance optimizations
-- [ ] Additional EMV transaction types
-- [ ] Web dashboard for transaction monitoring
-- [ ] Enhanced security features
-- [ ] Multi-language support
+- [ ] Pay via In-house cards
 
 ---
 
