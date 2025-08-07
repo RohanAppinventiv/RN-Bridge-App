@@ -33,7 +33,7 @@ export interface EMVPaymentHook {
     clearTransactionListener: () => void;
     clearAllTransactions: () => void;
     cancelOperation: () => void;
-    initializeEMV: () => void;
+    initializeEMV: (config: EMVConfig) => void;
     subscribeToEvent: (eventName: EMVEventName, callback: (payload: any) => void) => void;
     unsubscribeFromEvent: (eventName: EMVEventName, callback: (payload: any) => void) => void;
     EVENTS: Record<EMVEventName, EMVEventName>;

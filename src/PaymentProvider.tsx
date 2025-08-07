@@ -1,15 +1,16 @@
-import React, { createContext, useContext } from "react";
+import React, { createContext } from "react";
 import { NativeEventEmitter, NativeModules, Platform } from "react-native";
-import { CallbackLog, EMVConfig, EVENT_NAMES, EMVEventName, EMVPaymentHook, PaymentContextType } from "./types";
+import { CallbackLog, EMVConfig, EVENT_NAMES, EMVEventName, PaymentContextType } from "./types";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 
 const PaymentContext = createContext<PaymentContextType | undefined>(undefined);
 
 
-function PaymentProvider({ children, config }: {
+function PaymentProvider({ children, config, disabled = false }: {
     children: React.ReactNode,
-    config: EMVConfig
+    config: EMVConfig,
+    disabled?: boolean
 }) {
     const { DsiEMVManagerBridge } = NativeModules;
 
@@ -33,7 +34,7 @@ function PaymentProvider({ children, config }: {
     }, []);
 
     // Initialize the EMV manager with configuration data (called only once)
-    const initializeEMV = useCallback(() => {
+    const initializeEMV = useCallback((config: EMVConfig) => {
         if (isInitialized) {
             appendLog('initialize', 'EMV already initialized');
             setIsInitialized(true);
@@ -87,6 +88,9 @@ function PaymentProvider({ children, config }: {
     useEffect(() => {
         if (!DsiEMVManagerBridge) {
             console.error('Native module DsiEMVManagerBridge not found');
+            return;
+        }
+        if (disabled) {
             return;
         }
 
@@ -235,7 +239,7 @@ function PaymentProvider({ children, config }: {
 
         // Initialize EMV manager first (only once)
         if (config)
-            initializeEMV();
+            initializeEMV(config);
         else
             console.error("MISSING CONFIGURATION for INITIALIZATION");
 
@@ -313,7 +317,7 @@ function PaymentProvider({ children, config }: {
         try {
             if (!isInitialized) {
                 appendLog('setupConfig', 'EMV not initialized. Initializing first...');
-                initializeEMV();
+                initializeEMV(config);
                 return;
             }
 
