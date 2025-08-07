@@ -258,7 +258,7 @@ function PaymentProvider({ children, config, disabled = false }: {
                 DsiEMVManagerBridge.clearTransactionListener();
             }
         };
-    }, [appendLog]);
+    }, [appendLog, disabled]);
 
     // Export the specific functions from DsiEMVManagerBridge
     const runSaleTransaction = useCallback((amount: string) => {
